@@ -1,41 +1,157 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Blog | Ankit Mohan Pandey</title>
-  <meta name="description" content="Technical blogs by Ankit Mohan Pandey on Data Engineering and GCP">
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog - Ankit Mohan Pandey</title>
+    <meta name="description" content="Read articles by Ankit Mohan Pandey on data engineering, GCP, Apache Beam, Airflow, BigQuery, and large-scale data systems.">
+    <meta name="keywords" content="Blog, Data Engineering, GCP, Apache Beam, Airflow, BigQuery, Technical Articles">
+    <meta name="author" content="Ankit Mohan Pandey">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Blog - Ankit Mohan Pandey">
+    <meta property="og:description" content="Technical articles on data engineering and cloud technologies">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://ankitmohanpandey.in/blog.html">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <nav>
+        <div class="nav-container">
+            <div class="nav-brand">Ankit Mohan Pandey</div>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="blog.html" class="active">Blog</a></li>
+            </ul>
+        </div>
+    </nav>
 
-<header>
-  <h1>Blog</h1>
-</header>
+    <main>
+        <section style="padding: var(--spacing-2xl) 0;">
+            <div class="container">
+                <h1 class="fade-in">Blog</h1>
+                <p style="text-align: center; font-size: var(--font-size-lg); color: var(--text-muted); margin-bottom: var(--spacing-2xl);">
+                    Thoughts, insights, and technical explorations in data engineering
+                </p>
 
-<nav>
-  <a href="index.html">Home</a>
-  <a href="about.html">About</a>
-</nav>
+                <div class="grid-2">
+                    <div class="blog-card" onclick="window.location.href='blog/spark-vs-beam.html'">
+                        <h3 class="blog-title">Apache Spark vs Apache Beam: Choosing the Right Framework</h3>
+                        <p class="blog-meta">8 min read · Data Engineering</p>
+                        <p class="blog-description">
+                            A comprehensive comparison of Apache Spark and Apache Beam for large-scale data processing. 
+                            Explore the strengths, weaknesses, and ideal use cases for each framework to make informed 
+                            decisions for your data engineering projects.
+                        </p>
+                    </div>
 
-<section>
-  <ul>
-    <li>
-      <a href="blog/apache-beam-intro.html">
-        Apache Beam Explained Simply
-      </a>
-    </li>
-    <li>
-      <a href="blog/spark-vs-beam.html">
-        Apache Spark vs Apache Beam
-      </a>
-    </li>
-  </ul>
-</section>
+                    <div class="blog-card">
+                        <h3 class="blog-title">Optimizing BigQuery Performance at Scale</h3>
+                        <p class="blog-meta">6 min read · Cloud Data</p>
+                        <p class="blog-description">
+                            Advanced techniques for optimizing BigQuery queries and reducing costs in enterprise environments. 
+                            Learn about partitioning strategies, clustering best practices, and query optimization patterns 
+                            for petabyte-scale datasets.
+                        </p>
+                    </div>
 
-<footer>
-  <p>© 2026 Ankit Mohan Pandey</p>
-</footer>
+                    <div class="blog-card">
+                        <h3 class="blog-title">Building Resilient Data Pipelines with Apache Airflow</h3>
+                        <p class="blog-meta">7 min read · Workflow Orchestration</p>
+                        <p class="blog-description">
+                            Design patterns and best practices for building fault-tolerant data workflows using Apache Airflow. 
+                            Covers task dependencies, error handling, monitoring, and scaling strategies for production environments.
+                        </p>
+                    </div>
 
+                    <div class="blog-card">
+                        <h3 class="blog-title">Real-time Stream Processing with Apache Beam</h3>
+                        <p class="blog-meta">9 min read · Streaming</p>
+                        <p class="blog-description">
+                            Deep dive into building real-time data processing pipelines with Apache Beam. Explore windowing strategies, 
+                            state management, and handling late data in streaming applications that process millions of events per second.
+                        </p>
+                    </div>
+
+                    <div class="blog-card">
+                        <h3 class="blog-title">Data Governance in Cloud Environments</h3>
+                        <p class="blog-meta">5 min read · Data Quality</p>
+                        <p class="blog-description">
+                            Implementing comprehensive data governance frameworks in Google Cloud Platform. Learn about data lineage, 
+                            quality monitoring, access control, and compliance strategies for enterprise data ecosystems.
+                        </p>
+                    </div>
+
+                    <div class="blog-card">
+                        <h3 class="blog-title">Cost Optimization Strategies for GCP Data Services</h3>
+                        <p class="blog-meta">6 min read · Cloud Economics</p>
+                        <p class="blog-description">
+                            Practical strategies for reducing costs while maintaining performance in GCP data services. Covers resource 
+                            optimization, rightsizing, scheduling, and architectural patterns that deliver maximum value.
+                        </p>
+                    </div>
+
+                    <div class="blog-card">
+                        <h3 class="blog-title">Testing Data Pipelines: Best Practices</h3>
+                        <p class="blog-meta">5 min read · Testing & Quality</p>
+                        <p class="blog-description">
+                            Comprehensive guide to testing data pipelines from unit tests to integration tests. Learn about data validation, 
+                            schema testing, performance testing, and automated testing strategies for data engineering workflows.
+                        </p>
+                    </div>
+
+                    <div class="blog-card">
+                        <h3 class="blog-title">Migrating On-Premise Data Warehouses to BigQuery</h3>
+                        <p class="blog-meta">8 min read · Cloud Migration</p>
+                        <p class="blog-description">
+                            Step-by-step guide for migrating traditional data warehouses to Google BigQuery. Covers assessment, 
+                            migration strategies, performance tuning, and post-migration optimization for enterprise-scale deployments.
+                        </p>
+                    </div>
+
+                    <div class="blog-card">
+                        <h3 class="blog-title">Monitoring and Observability in Data Systems</h3>
+                        <p class="blog-meta">7 min read · Operations</p>
+                        <p class="blog-description">
+                            Building comprehensive monitoring solutions for data pipelines and systems. Learn about metrics collection, 
+                            alerting strategies, log analysis, and creating dashboards that provide actionable insights into system health.
+                        </p>
+                    </div>
+
+                    <div class="blog-card">
+                        <h3 class="blog-title">Security Best Practices for Data Engineering</h3>
+                        <p class="blog-meta">6 min read · Security</p>
+                        <p class="blog-description">
+                            Essential security practices for data engineering in cloud environments. Covers data encryption, access management, 
+                            network security, and compliance requirements for handling sensitive data in production systems.
+                        </p>
+                    </div>
+                </div>
+
+                <div style="text-align: center; margin-top: var(--spacing-2xl); padding-top: var(--spacing-xl); border-top: 1px solid var(--border-color);">
+                    <p style="color: var(--text-muted); margin-bottom: var(--spacing-md);">
+                        More articles coming soon. Subscribe to stay updated!
+                    </p>
+                    <div style="display: flex; gap: var(--spacing-lg); justify-content: center; align-items: center;">
+                        <a href="index.html" style="color: var(--accent-primary);">← Back to Home</a>
+                        <span style="color: var(--text-muted);">•</span>
+                        <a href="about.html" style="color: var(--accent-primary);">About Me</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer style="text-align: center; padding: var(--spacing-xl) 0; border-top: 1px solid var(--border-color); margin-top: var(--spacing-2xl);">
+        <div class="container">
+            <p style="color: var(--text-muted);">© 2024 Ankit Mohan Pandey. Built with passion for data engineering.</p>
+        </div>
+    </footer>
 </body>
 </html>
-
