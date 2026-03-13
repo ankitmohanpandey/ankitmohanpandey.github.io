@@ -4,21 +4,40 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Blog - Ankit Mohan Pandey</title>
-    <meta name="description" content="Read articles by Ankit Mohan Pandey on data engineering, GCP, Apache Beam, Airflow, BigQuery, and large-scale data systems.">
-    <meta name="keywords" content="Blog, Data Engineering, GCP, Apache Beam, Airflow, BigQuery, Technical Articles">
+    <meta name="description" content="Thoughts on data engineering, systems thinking, and technical leadership. Exploring trade-offs, decisions, and building reliable data systems.">
+    <meta name="keywords" content="Blog, Data Engineering, Systems Thinking, Technical Leadership, Decision Making">
     <meta name="author" content="Ankit Mohan Pandey">
     
     <!-- Open Graph Meta Tags -->
     <meta property="og:title" content="Blog - Ankit Mohan Pandey">
-    <meta property="og:description" content="Technical articles on data engineering and cloud technologies">
+    <meta property="og:description" content="Thoughts on data engineering, systems thinking, and technical leadership">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://ankitmohanpandey.in/blog.html">
     
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     
+    <!-- RSS Feed -->
+    <link rel="alternate" type="application/rss+xml" title="Ankit Mohan Pandey - Blog Feed" href="/feed.xml">
+    
     <!-- CSS -->
     <link rel="stylesheet" href="/style.css">
+    
+    <!-- Schema.org Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Blog",
+      "name": "Ankit Mohan Pandey's Blog",
+      "description": "Thoughts on data engineering, systems thinking, and technical leadership. Exploring trade-offs, decisions, and building reliable data systems.",
+      "url": "https://ankitmohanpandey.in/blog.html",
+      "author": {
+        "@type": "Person",
+        "name": "Ankit Mohan Pandey",
+        "url": "https://ankitmohanpandey.in"
+      }
+    }
+    </script>
 </head>
 <body>
     <nav>
@@ -33,110 +52,95 @@
     </nav>
 
     <main>
-        <section style="padding: var(--spacing-2xl) 0;">
+        <section style="padding: var(--spacing-3xl) 0;">
             <div class="container">
                 <h1 class="fade-in">Blog</h1>
                 <p style="text-align: center; font-size: var(--font-size-lg); color: var(--text-muted); margin-bottom: var(--spacing-2xl);">
-                    Thoughts, insights, and technical explorations in data engineering
+                    Thoughts on systems thinking, technical decisions, and building reliable data systems
                 </p>
 
                 <div class="grid-2">
-                    <div class="blog-card" onclick="window.location.href='blog/spark-vs-beam.html'">
-                        <h3 class="blog-title">Apache Spark vs Apache Beam: Choosing the Right Framework</h3>
-                        <p class="blog-meta">8 min read · Data Engineering</p>
+                    <div class="blog-card" onclick="window.location.href='/blog/when-to-choose-streaming-vs-batch.html'">
+                        <h3 class="blog-title">When to Choose Streaming vs Batch: A Decision Framework</h3>
+                        <p class="blog-meta">12 min read · Systems Design</p>
                         <p class="blog-description">
-                            A comprehensive comparison of Apache Spark and Apache Beam for large-scale data processing. 
-                            Explore the strengths, weaknesses, and ideal use cases for each framework to make informed 
-                            decisions for your data engineering projects.
+                            Most articles compare streaming and batch technologies. Instead, let's explore the decision framework 
+                            for choosing between them. It's not about capabilities—it's about business needs, team skills, 
+                            and operational complexity.
                         </p>
                     </div>
 
-                    <div class="blog-card">
-                        <h3 class="blog-title">Optimizing BigQuery Performance at Scale</h3>
-                        <p class="blog-meta">6 min read · Cloud Data</p>
+                    <div class="blog-card" onclick="window.location.href='/blog/technical-debt-as-financial-debt.html'">
+                        <h3 class="blog-title">Technical Debt as Financial Debt: A Practical Framework</h3>
+                        <p class="blog-meta">8 min read · Engineering Economics</p>
                         <p class="blog-description">
-                            Advanced techniques for optimizing BigQuery queries and reducing costs in enterprise environments. 
-                            Learn about partitioning strategies, clustering best practices, and query optimization patterns 
-                            for petabyte-scale datasets.
+                            Treating technical debt like financial debt changes how we make decisions. Here's a practical framework 
+                            for measuring, prioritizing, and communicating technical debt in terms business stakeholders understand.
                         </p>
                     </div>
 
-                    <div class="blog-card">
-                        <h3 class="blog-title">Building Resilient Data Pipelines with Apache Airflow</h3>
-                        <p class="blog-meta">7 min read · Workflow Orchestration</p>
+                    <div class="blog-card" onclick="window.location.href='/blog/building-reliable-data-pipelines.html'">
+                        <h3 class="blog-title">Building Reliable Data Pipelines: Beyond the Happy Path</h3>
+                        <p class="blog-meta">10 min read · Reliability Engineering</p>
                         <p class="blog-description">
-                            Design patterns and best practices for building fault-tolerant data workflows using Apache Airflow. 
-                            Covers task dependencies, error handling, monitoring, and scaling strategies for production environments.
+                            Most data pipelines work perfectly when everything goes right. The real challenge is handling 
+                            failures gracefully. Let's explore patterns for building pipelines that fail well and recover 
+                            automatically.
                         </p>
                     </div>
 
-                    <div class="blog-card">
-                        <h3 class="blog-title">Real-time Stream Processing with Apache Beam</h3>
-                        <p class="blog-meta">9 min read · Streaming</p>
+                    <div class="blog-card" onclick="window.location.href='/blog/the-simplicity-principle-in-data-systems.html'">
+                        <h3 class="blog-title">The Simplicity Principle in Data Systems</h3>
+                        <p class="blog-meta">7 min read · Systems Thinking</p>
                         <p class="blog-description">
-                            Deep dive into building real-time data processing pipelines with Apache Beam. Explore windowing strategies, 
-                            state management, and handling late data in streaming applications that process millions of events per second.
+                            Why do we choose complex solutions when simple ones would suffice? Exploring the psychology 
+                            behind over-engineering and practical principles for choosing simplicity in data system design.
                         </p>
                     </div>
 
-                    <div class="blog-card">
-                        <h3 class="blog-title">Data Governance in Cloud Environments</h3>
-                        <p class="blog-meta">5 min read · Data Quality</p>
+                    <div class="blog-card" onclick="window.location.href='/blog/making-technical-decisions-under-uncertainty.html'">
+                        <h3 class="blog-title">Making Technical Decisions Under Uncertainty</h3>
+                        <p class="blog-meta">9 min read · Decision Making</p>
                         <p class="blog-description">
-                            Implementing comprehensive data governance frameworks in Google Cloud Platform. Learn about data lineage, 
-                            quality monitoring, access control, and compliance strategies for enterprise data ecosystems.
+                            Technical leadership often means making decisions with incomplete information. Here's a systematic 
+                            approach to gathering information, weighing options, and making decisions that are reversible 
+                            when possible.
                         </p>
                     </div>
 
-                    <div class="blog-card">
-                        <h3 class="blog-title">Cost Optimization Strategies for GCP Data Services</h3>
-                        <p class="blog-meta">6 min read · Cloud Economics</p>
+                    <div class="blog-card" onclick="window.location.href='/blog/data-quality-as-architecture.html'">
+                        <h3 class="blog-title">Data Quality as Architecture, Not Afterthought</h3>
+                        <p class="blog-meta">11 min read · Data Architecture</p>
                         <p class="blog-description">
-                            Practical strategies for reducing costs while maintaining performance in GCP data services. Covers resource 
-                            optimization, rightsizing, scheduling, and architectural patterns that deliver maximum value.
+                            Data quality shouldn't be a separate validation step. It should be designed into the architecture 
+                            from the beginning. Exploring patterns for building systems where correct data is the path 
+                            of least resistance.
                         </p>
                     </div>
 
-                    <div class="blog-card">
-                        <h3 class="blog-title">Testing Data Pipelines: Best Practices</h3>
-                        <p class="blog-meta">5 min read · Testing & Quality</p>
+                    <div class="blog-card" onclick="window.location.href='/blog/mentoring-for-technical-leadership.html'">
+                        <h3 class="blog-title">Mentoring for Technical Leadership: Growing Beyond Code</h3>
+                        <p class="blog-meta">6 min read · Leadership Development</p>
                         <p class="blog-description">
-                            Comprehensive guide to testing data pipelines from unit tests to integration tests. Learn about data validation, 
-                            schema testing, performance testing, and automated testing strategies for data engineering workflows.
+                            The transition from senior engineer to technical leader isn't about writing better code—it's about 
+                            developing different skills. Here's what I've learned about mentoring engineers for leadership roles.
                         </p>
                     </div>
 
-                    <div class="blog-card">
-                        <h3 class="blog-title">Migrating On-Premise Data Warehouses to BigQuery</h3>
-                        <p class="blog-meta">8 min read · Cloud Migration</p>
+                    <div class="blog-card" onclick="window.location.href='/blog/trade-offs-in-cloud-data-platforms.html'">
+                        <h3 class="blog-title">Trade-offs in Cloud Data Platform Design</h3>
+                        <p class="blog-meta">13 min read · Cloud Architecture</p>
                         <p class="blog-description">
-                            Step-by-step guide for migrating traditional data warehouses to Google BigQuery. Covers assessment, 
-                            migration strategies, performance tuning, and post-migration optimization for enterprise-scale deployments.
-                        </p>
-                    </div>
-
-                    <div class="blog-card">
-                        <h3 class="blog-title">Monitoring and Observability in Data Systems</h3>
-                        <p class="blog-meta">7 min read · Operations</p>
-                        <p class="blog-description">
-                            Building comprehensive monitoring solutions for data pipelines and systems. Learn about metrics collection, 
-                            alerting strategies, log analysis, and creating dashboards that provide actionable insights into system health.
-                        </p>
-                    </div>
-
-                    <div class="blog-card">
-                        <h3 class="blog-title">Security Best Practices for Data Engineering</h3>
-                        <p class="blog-meta">6 min read · Security</p>
-                        <p class="blog-description">
-                            Essential security practices for data engineering in cloud environments. Covers data encryption, access management, 
-                            network security, and compliance requirements for handling sensitive data in production systems.
+                            Choosing between managed services and self-hosted solutions involves complex trade-offs. 
+                            Let's explore the decision framework for cloud data platforms that balances cost, control, 
+                            and team capabilities.
                         </p>
                     </div>
                 </div>
 
                 <div style="text-align: center; margin-top: var(--spacing-2xl); padding-top: var(--spacing-xl); border-top: 1px solid var(--border-color);">
                     <p style="color: var(--text-muted); margin-bottom: var(--spacing-md);">
-                        More articles coming soon. Subscribe to stay updated!
+                        More articles coming soon. I focus on quality over quantity.
                     </p>
                     <div style="display: flex; gap: var(--spacing-lg); justify-content: center; align-items: center;">
                         <a href="/index.html" style="color: var(--accent-primary);">← Back to Home</a>
@@ -146,11 +150,57 @@
                 </div>
             </div>
         </section>
+
+        <section style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: var(--spacing-3xl) 0;">
+            <div class="container-narrow" style="text-align: center;">
+                <h2 style="color: white; margin-bottom: var(--spacing-md);">📬 Get Notified About New Posts</h2>
+                <p style="color: rgba(255, 255, 255, 0.9); font-size: var(--font-size-lg); margin-bottom: var(--spacing-xl); max-width: 600px; margin-left: auto; margin-right: auto;">
+                    I write about systems thinking, technical decisions, and building reliable data systems. 
+                    Subscribe to get notified when I publish new articles.
+                </p>
+                
+                <div style="background: white; padding: var(--spacing-xl); border-radius: 12px; max-width: 500px; margin: 0 auto; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);">
+                    <div style="text-align: center;">
+                        <p style="color: #333; font-size: var(--font-size-lg); margin-bottom: var(--spacing-lg); font-weight: 500;">
+                            Join my newsletter for insights on data engineering, systems thinking, and technical leadership.
+                        </p>
+                        <a href="https://ankitmohanpandey.substack.com/subscribe" target="_blank" rel="noopener noreferrer" style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1rem 2.5rem; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: var(--font-size-lg); transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 20px rgba(102, 126, 234, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                            📧 Subscribe on Substack
+                        </a>
+                        <p style="color: var(--text-muted); font-size: var(--font-size-sm); margin-top: var(--spacing-lg);">
+                            No spam. Unsubscribe anytime. Quality over quantity.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
     </main>
 
-    <footer style="text-align: center; padding: var(--spacing-xl) 0; border-top: 1px solid var(--border-color); margin-top: var(--spacing-2xl);">
+    <footer>
         <div class="container">
-            <p style="color: var(--text-muted);">© 2024 Ankit Mohan Pandey. Built with passion for data engineering.</p>
+            <div style="display: flex; justify-content: center; gap: var(--spacing-lg); margin-bottom: var(--spacing-md);">
+                <a href="https://github.com/ankitmohanpandey" target="_blank" rel="noopener noreferrer" style="color: var(--text-muted); text-decoration: none; transition: color 0.3s;" onmouseover="this.style.color='var(--accent-primary)'" onmouseout="this.style.color='var(--text-muted)'">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                    </svg>
+                </a>
+                <a href="https://www.linkedin.com/in/ankit-mohan-pandey-9264081b5/" target="_blank" rel="noopener noreferrer" style="color: var(--text-muted); text-decoration: none; transition: color 0.3s;" onmouseover="this.style.color='var(--accent-primary)'" onmouseout="this.style.color='var(--text-muted)'">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                    </svg>
+                </a>
+                <a href="https://ankitmohanpandey.hashnode.dev" target="_blank" rel="noopener noreferrer" style="color: var(--text-muted); text-decoration: none; transition: color 0.3s;" onmouseover="this.style.color='var(--accent-primary)'" onmouseout="this.style.color='var(--text-muted)'">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M22.351 8.019l-6.37-6.37a5.63 5.63 0 0 0-7.962 0l-6.37 6.37a5.63 5.63 0 0 0 0 7.962l6.37 6.37a5.63 5.63 0 0 0 7.962 0l6.37-6.37a5.63 5.63 0 0 0 0-7.962zM12 15.953a3.953 3.953 0 1 1 0-7.906 3.953 3.953 0 0 1 0 7.906z"/>
+                    </svg>
+                </a>
+                <a href="mailto:ankitmohanpandey@outlook.com" style="color: var(--text-muted); text-decoration: none; transition: color 0.3s;" onmouseover="this.style.color='var(--accent-primary)'" onmouseout="this.style.color='var(--text-muted)'">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                    </svg>
+                </a>
+            </div>
+            <p style="color: var(--text-muted); text-align: center;">© 2026 Ankit Mohan Pandey. Building reliable data systems through thoughtful engineering.</p>
         </div>
     </footer>
 </body>
