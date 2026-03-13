@@ -14,6 +14,8 @@ import feedparser
 import os
 from datetime import datetime
 import re
+import requests
+import xml.etree.ElementTree as ET
 
 SUBSTACK_RSS = "https://ankitmohanpandey.substack.com/feed"
 BLOG_DIR = "blog"
@@ -158,26 +160,53 @@ def update_blog_listing(posts):
     else:
         print(f"⚠ Warning: Could not find blog cards section in {BLOG_LIST_FILE}")
 
+def parse_substack_rss():
+    """Parse Substack RSS feed using XML parser"""
+    try:
+        response = requests.get(SUBSTACK_RSS, timeout=10)
+        response.raise_for_status()
+        
+        root = ET.fromstring(response.content)
+        
+        # Find all items in the RSS feed
+        items = root.findall('.//item')
+        
+        posts = []
+        for item in items:
+            post = {
+                'title': item.find('title').text if item.find('title') is not None else 'Untitled',
+                'link': item.find('link').text if item.find('link') is not None else '',
+                'published': item.find('pubDate').text if item.find('pubDate') is not None else '',
+                'summary': item.find('description').text if item.find('description') is not None else '',
+                'content': [{'value': item.find('.//{http://purl.org/rss/1.0/modules/content/}encoded').text}] if item.find('.//{http://purl.org/rss/1.0/modules/content/}encoded') is not None else [{'value': ''}]
+            }
+            posts.append(post)
+        
+        return posts
+    except Exception as e:
+        print(f"Error parsing RSS: {e}")
+        return []
+
 def sync_posts():
     """Fetch Substack posts and create HTML files"""
     print(f"Fetching posts from {SUBSTACK_RSS}...")
     
-    feed = feedparser.parse(SUBSTACK_RSS)
+    posts = parse_substack_rss()
     
-    if not feed.entries:
+    if not posts:
         print("No posts found. Make sure your Substack URL is correct.")
         return
     
     # Create blog directory if it doesn't exist
     os.makedirs(BLOG_DIR, exist_ok=True)
     
-    print(f"Found {len(feed.entries)} posts")
+    print(f"Found {len(posts)} posts")
     
-    for entry in feed.entries:
-        filename = sanitize_filename(entry.title)
+    for post in posts:
+        filename = sanitize_filename(post['title'])
         filepath = os.path.join(BLOG_DIR, filename)
         
-        html_content = create_blog_post_html(entry)
+        html_content = create_blog_post_html(post)
         
         with open(filepath, 'w', encoding='utf-8') as f:
             f.write(html_content)
@@ -185,7 +214,7 @@ def sync_posts():
         print(f"✓ Created: {filepath}")
     
     # Update blog listing page
-    update_blog_listing(feed.entries)
+    update_blog_listing(posts)
     
     print("\n✅ Sync complete! All posts synced and blog.html updated.")
 
