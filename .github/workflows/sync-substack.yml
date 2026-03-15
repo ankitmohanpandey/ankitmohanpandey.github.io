@@ -31,5 +31,5 @@ jobs:
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add blog/
+          git add blog/ blog.html
           git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-sync: Update blog posts from Substack" && git push)
