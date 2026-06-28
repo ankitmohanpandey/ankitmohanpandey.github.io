@@ -1,140 +1,249 @@
-# Ankit Mohan Pandey - Personal Website
+# Ankit Mohan Pandey - Automated Multi-Platform Publishing System
 
-A professional, modern personal website built with pure HTML, CSS, and minimal JavaScript. This website showcases my work as a Senior Data Engineer specializing in GCP, Apache Beam, Airflow, and BigQuery.
+A production-grade automated publishing platform built with Next.js 15, TypeScript, and Tailwind CSS. Write once, publish everywhere - automatically.
 
 ## 🚀 Features
 
-- **Modern Dark Theme**: Professional dark theme with subtle gradients and accent colors
-- **Responsive Design**: Mobile-first approach with breakpoints for all screen sizes
-- **Smooth Animations**: CSS-only animations with hover effects and transitions
-- **SEO Optimized**: Proper meta tags, semantic HTML, and structured content
-- **Fast Loading**: No external dependencies, minimal CSS, and optimized images
-- **Professional Content**: Technical blog posts and comprehensive about section
+- **Single Source of Truth**: Write content in MDX, publish to multiple platforms automatically
+- **Automated Publishing**: GitHub Actions workflow handles deployment, RSS, newsletters, and social media
+- **Multi-Platform Support**: Hashnode, Beehiiv, LinkedIn, Twitter/X
+- **SEO Optimized**: Automatic sitemap, robots.txt, OpenGraph, JSON-LD structured data
+- **Analytics Integration**: GA4, Microsoft Clarity, Vercel Analytics
+- **Modern Stack**: Next.js 15 (App Router), TypeScript, Tailwind CSS, MDX
+- **Performance Optimized**: Lighthouse 100 target, Core Web Vitals optimized
 
-## 📁 Structure
+## 📁 Project Structure
 
 ```
-├── index.html          # Home page with hero section and overview
-├── about.html          # Professional storytelling and journey
-├── blog.html           # Blog listing with card layout
-├── style.css           # Complete styling with CSS variables
-├── CNAME              # Custom domain configuration
-├── README.md          # This file
-└── blog/
-    └── spark-vs-beam.html  # Sample blog post
+├── app/                      # Next.js App Router
+│   ├── blog/                # Blog pages
+│   ├── rss.xml/             # RSS feed generation
+│   ├── layout.tsx           # Root layout with SEO
+│   ├── page.tsx             # Homepage
+│   ├── sitemap.ts           # Sitemap generation
+│   └── robots.ts            # Robots.txt generation
+├── components/              # React components
+│   ├── blog/                # Blog-specific components
+│   ├── Analytics.tsx        # Analytics integration
+│   ├── Navbar.tsx           # Navigation
+│   └── Footer.tsx           # Footer
+├── content/blog/            # MDX blog posts
+├── lib/                     # Core utilities
+│   ├── publishers/          # Platform publishers (Hashnode, Beehiiv)
+│   ├── validators/          # Frontmatter validation
+│   ├── types/               # TypeScript types
+│   ├── blog.ts              # Blog utilities
+│   └── utils.ts             # General utilities
+├── scripts/                 # Automation scripts
+│   ├── generate-social.ts   # Generate LinkedIn/Twitter drafts
+│   ├── publish.ts           # Publish to all platforms
+│   └── ping-google.ts       # Google Indexing API
+├── social/                  # Generated social media content
+│   ├── linkedin/            # LinkedIn post drafts
+│   └── twitter/             # Twitter thread drafts
+└── .github/workflows/       # CI/CD workflows
+    ├── ci.yml               # Lint, type-check, build
+    └── publish.yml          # Full publish pipeline
 ```
 
-## 🎨 Design Principles
+## 🛠️ Tech Stack
 
-- **Minimalist Approach**: Clean, uncluttered design focusing on content
-- **Professional Aesthetics**: Dark theme suitable for technical audience
-- **Accessibility**: Semantic HTML, proper contrast ratios, keyboard navigation
-- **Performance**: No frameworks, minimal dependencies, fast load times
-- **Typography**: System fonts for consistency and performance
+- **Frontend**: Next.js 15, React 19, TypeScript
+- **Styling**: Tailwind CSS
+- **Content**: MDX with syntax highlighting
+- **Hosting**: Vercel
+- **Automation**: GitHub Actions
+- **Analytics**: GA4, Microsoft Clarity, Vercel Analytics
 
-## 🛠️ Technologies Used
+## 📝 Getting Started
 
-- **HTML5**: Semantic markup with proper structure
-- **CSS3**: Modern features including Grid, Flexbox, and CSS Variables
-- **No JavaScript Frameworks**: Pure CSS animations and interactions
-- **Responsive Design**: Mobile-first approach with fluid layouts
+### Prerequisites
 
-## 📱 Responsive Breakpoints
+- Node.js 20+
+- npm or yarn
 
-- **Mobile**: < 480px
-- **Tablet**: 480px - 768px
-- **Desktop**: > 768px
+### Installation
 
-## 🌐 Deployment
+```bash
+# Install dependencies
+npm install
 
-This website is designed for GitHub Pages deployment:
+# Copy environment variables template
+cp .env.example .env.local
 
-1. Push to the main branch
-2. Enable GitHub Pages in repository settings
-3. Custom domain configured via CNAME file
-4. Automatic SSL certificate provided by GitHub
+# Add your API keys to .env.local
+```
 
-## 📊 Content Strategy
+### Environment Variables
 
-### Home Page
-- Hero section with name and professional tagline
-- Overview of technical expertise
-- Key focus areas with card layout
-- Latest blog posts preview
+Create a `.env.local` file with the following variables:
 
-### About Page
-- Professional journey narrative
-- Technical focus areas
-- Current explorations and interests
-- Personal philosophy and approach
+```env
+# Analytics
+NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX
+NEXT_PUBLIC_CLARITY_ID=XXXXXXXXXX
+NEXT_PUBLIC_VERCEL_ANALYTICS_ID=XXXXXXXXXX
 
-### Blog Section
-- Technical articles on data engineering
-- Framework comparisons and best practices
-- Cloud architecture patterns
-- Performance optimization techniques
+# SEO
+GOOGLE_SITE_VERIFICATION=XXXXXXXXXX
 
-## 🔧 Customization
+# Hashnode
+HASHNODE_API_KEY=your_hashnode_api_key
+HASHNODE_PUBLICATION_ID=your_publication_id
 
-### Colors
-Update CSS variables in `style.css`:
+# Beehiiv
+BEEHIIV_API_KEY=your_beehiiv_api_key
+BEEHIIV_PUBLICATION_ID=your_publication_id
 
-```css
-:root {
-  --accent-primary: #4a9eff;
-  --accent-secondary: #6bb6ff;
-  --primary-bg: #0a0a0a;
-  /* ... other variables */
+# Google Indexing API
+GOOGLE_INDEXING_API_KEY=your_google_indexing_api_key
+
+# Vercel
+VERCEL_TOKEN=your_vercel_token
+VERCEL_ORG_ID=your_vercel_org_id
+VERCEL_PROJECT_ID=your_vercel_project_id
+```
+
+### Development
+
+```bash
+# Run development server
+npm run dev
+
+# Type checking
+npm run type-check
+
+# Linting
+npm run lint
+
+# Build
+npm run build
+```
+
+## 📝 Creating Blog Posts
+
+1. Create a new MDX file in `content/blog/` with the following frontmatter:
+
+```mdx
+---
+title: Your Post Title
+description: A brief description of your post
+tags: ['tag1', 'tag2', 'tag3']
+categories: ['Data Engineering']
+coverImage: /images/cover.jpg
+author: Ankit Mohan Pandey
+publishedDate: 2024-01-01
+updatedDate: 2024-01-02
+draft: false
+---
+
+Your content here...
+```
+
+2. The post will automatically be:
+   - Validated for frontmatter
+   - Added to the blog listing
+   - Included in RSS feed
+   - Added to sitemap
+
+## 🚀 Publishing Workflow
+
+When you push to `main` branch:
+
+1. **Validation**: Frontmatter validation, type checking, linting
+2. **Build**: Next.js production build
+3. **Social Generation**: LinkedIn and Twitter drafts generated
+4. **Platform Publishing**: 
+   - Hashnode (via GraphQL API)
+   - Beehiiv (via REST API)
+5. **Deployment**: Deploy to Vercel
+6. **SEO**: Ping Google Indexing API
+
+### Manual Publishing
+
+```bash
+# Generate social media drafts
+npm run generate-social
+
+# Publish to all platforms
+npm run publish
+```
+
+## 🔧 Architecture
+
+### Publisher Interface
+
+The system uses an adapter pattern for platform publishers:
+
+```typescript
+interface Publisher {
+  name: string;
+  publish(post: BlogPost): Promise<PublishResult>;
+  validateConfig(): boolean;
 }
 ```
 
-### Typography
-Font sizes and families are controlled through CSS variables for easy customization.
+Each platform (Hashnode, Beehiiv, etc.) implements this interface, making it easy to add new platforms.
 
-### Content
-All content is in the HTML files. Update text, add new blog posts, or modify sections as needed.
+### Content Pipeline
 
-## 📈 SEO Features
+```
+MDX File → Validation → Build → Deploy → RSS → Newsletter → Social → SEO
+```
 
-- Meta descriptions for all pages
-- Open Graph tags for social sharing
-- Semantic HTML structure
-- Proper heading hierarchy
-- Alt text for images (when added)
-- Clean URLs and navigation
+## 📊 SEO Features
 
-## 🚀 Performance
+- **Automatic Sitemap**: Generated at `/sitemap.xml`
+- **Robots.txt**: Configured at `/robots.txt`
+- **RSS Feed**: Available at `/rss.xml`
+- **OpenGraph**: Dynamic OG tags for all pages
+- **JSON-LD**: Structured data for blog posts
+- **Canonical URLs**: Prevents duplicate content issues
+- **Meta Tags**: Optimized for search engines
 
-- **Lighthouse Score**: 95+ (Performance, Accessibility, Best Practices, SEO)
-- **Load Time**: < 2 seconds on 3G
-- **Size**: < 100KB total (including CSS)
-- **No JavaScript Frameworks**: Pure CSS interactions
+## 🔒 Security
 
-## 📝 Adding New Blog Posts
+- Environment variables for sensitive data
+- API keys stored in GitHub Secrets
+- No hardcoded credentials
+- Content validation before publishing
 
-1. Create new HTML file in `blog/` directory
-2. Follow the template from `spark-vs-beam.html`
-3. Update `blog.html` with new post card
-4. Add appropriate meta tags and SEO optimization
+## 📈 Performance
 
-## 🔄 Maintenance
+- **Lighthouse Score**: Target 100
+- **Core Web Vitals**: Optimized
+- **Image Optimization**: Next.js Image component
+- **Static Generation**: Where possible
+- **ISR**: Incremental Static Regeneration
 
-- **Content Updates**: Regularly add new blog posts
-- **Link Checking**: Verify external links periodically
-- **Performance**: Monitor Core Web Vitals
-- **SEO**: Update meta descriptions and keywords
+## 🚀 Deployment
 
-## 📧 Contact
+### Vercel
 
-For inquiries about this website or data engineering opportunities:
+1. Connect your GitHub repository to Vercel
+2. Add environment variables in Vercel dashboard
+3. Deploy automatically on push to main
 
-- **Domain**: ankitmohanpandey.in
-- **Professional Focus**: Data Engineering, GCP, Apache Beam, Airflow, BigQuery
+### GitHub Actions
+
+The `.github/workflows/publish.yml` handles the entire pipeline automatically.
+
+## 📚 Documentation
+
+- [Next.js Documentation](https://nextjs.org/docs)
+- [MDX Documentation](https://mdxjs.com)
+- [Tailwind CSS Documentation](https://tailwindcss.com/docs)
+- [Hashnode API](https://hashnode.com/docs/api)
+- [Beehiiv API](https://www.beehiiv.com/api)
+
+## 🤝 Contributing
+
+This is a personal project, but feel free to use it as inspiration for your own publishing platform.
 
 ## 📄 License
 
-This website design and code is open source. Feel free to use it as inspiration for your own professional website.
+This project is open source. Feel to use and modify as needed.
 
 ---
 
-Built with ❤️ for the data engineering community
+Built with ❤️ by Ankit Mohan Pandey
