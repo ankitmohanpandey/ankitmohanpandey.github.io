@@ -61,6 +61,11 @@ function generateSocialPosts() {
   const fileNames = fs.readdirSync(contentDirectory);
   const mdxFiles = fileNames.filter((fileName) => fileName.endsWith('.mdx'));
 
+  if (mdxFiles.length === 0) {
+    console.log('No MDX files found in content/blog directory');
+    return;
+  }
+
   // Create social directories
   fs.mkdirSync(path.join(socialDirectory, 'linkedin'), { recursive: true });
   fs.mkdirSync(path.join(socialDirectory, 'twitter'), { recursive: true });

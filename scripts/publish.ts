@@ -9,9 +9,21 @@ const contentDirectory = path.join(process.cwd(), 'content/blog');
 async function publishWorkflow() {
   console.log('🚀 Starting publish workflow...\n');
 
+  if (!fs.existsSync(contentDirectory)) {
+    console.log('No content/blog directory found');
+    console.log('✅ Publish workflow completed (no posts to publish)');
+    return;
+  }
+
   // Get all published posts
   const fileNames = fs.readdirSync(contentDirectory);
   const mdxFiles = fileNames.filter((fileName) => fileName.endsWith('.mdx'));
+
+  if (mdxFiles.length === 0) {
+    console.log('No MDX files found in content/blog directory');
+    console.log('✅ Publish workflow completed (no posts to publish)');
+    return;
+  }
 
   for (const fileName of mdxFiles) {
     const slug = fileName.replace(/\.mdx$/, '');

@@ -21,6 +21,8 @@ jobs:
   generate-social:
     runs-on: ubuntu-latest
     needs: validate
+    outputs:
+      has_posts: ${{ steps.check-social.outputs.has_posts }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -29,7 +31,16 @@ jobs:
           cache: 'npm'
       - run: npm ci
       - run: npx tsx scripts/generate-social.ts
+      - name: Check if social posts were generated
+        id: check-social
+        run: |
+          if [ -d "social" ] && [ "$(ls -A social)" ]; then
+            echo "has_posts=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_posts=false" >> $GITHUB_OUTPUT
+          fi
       - uses: actions/upload-artifact@v4
+        if: steps.check-social.outputs.has_posts == 'true'
         with:
           name: social-posts
           path: social/
@@ -37,6 +48,7 @@ jobs:
   publish-platforms:
     runs-on: ubuntu-latest
     needs: [validate, generate-social]
+    if: needs.generate-social.outputs.has_posts == 'true'
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -58,6 +70,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: [validate]
+    if: ${{ secrets.VERCEL_TOKEN != '' && secrets.VERCEL_ORG_ID != '' && secrets.VERCEL_PROJECT_ID != '' }}
     steps:
       - uses: actions/checkout@v4
       - uses: amondnet/vercel-action@v25
