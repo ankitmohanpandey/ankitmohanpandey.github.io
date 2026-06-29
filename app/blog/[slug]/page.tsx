@@ -15,13 +15,14 @@ const components = {
 };
 
 interface BlogPostPageProps {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 }
 
 export async function generateMetadata({ params }: BlogPostPageProps): Promise<Metadata> {
-  const post = getBlogPostBySlug(params.slug);
+  const { slug } = await params;
+  const post = getBlogPostBySlug(slug);
 
   if (!post) {
     return {
@@ -53,15 +54,16 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
   };
 }
 
-export default function BlogPostPage({ params }: BlogPostPageProps) {
-  const post = getBlogPostBySlug(params.slug);
+export default async function BlogPostPage({ params }: BlogPostPageProps) {
+  const { slug } = await params;
+  const post = getBlogPostBySlug(slug);
 
   if (!post) {
     notFound();
   }
 
-  const relatedPosts = getRelatedPosts(params.slug);
-  const { previous, next } = getPreviousAndNextPost(params.slug);
+  const relatedPosts = getRelatedPosts(slug);
+  const { previous, next } = getPreviousAndNextPost(slug);
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
