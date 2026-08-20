@@ -1,238 +1,98 @@
-# Architecture Documentation
+# Architecture
 
-## System Overview
+## The problem this solves
 
-This is an automated multi-platform publishing system built on Next.js 15 with a focus on developer experience, performance, and automation.
+Ankit writes on Substack. A personal site that requires re-publishing every
+essay by hand goes stale within a month. So the site treats Substack as a
+first-class content source rather than something to copy from, while still
+supporting hand-authored MDX for posts that need code blocks and diagrams.
 
-## Core Principles
-
-1. **Single Source of Truth**: MDX files in `content/blog/` are the canonical source
-2. **Automation First**: GitHub Actions handle the entire publishing pipeline
-3. **Extensibility**: Adapter pattern allows easy addition of new platforms
-4. **Type Safety**: TypeScript throughout with strict mode enabled
-5. **Performance**: Static generation where possible, ISR for dynamic content
-
-## Architecture Diagram
+## Content flow
 
 ```
-┌─────────────────┐
-│  Content (MDX)  │
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐
-│   Validation    │
-│  (Frontmatter)  │
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐
-│     Build       │
-│  (Next.js)      │
-└────────┬────────┘
-         │
-    ┌────┴────┐
-    │         │
-    ▼         ▼
-┌──────┐  ┌──────────┐
-│ Web  │  │  Social  │
-│ Site │  │  Drafts  │
-└───┬──┘  └────┬─────┘
-    │          │
-    ▼          ▼
-┌──────┐  ┌──────────┐
-│ RSS  │  │ Platforms│
-│ Feed │  │ (Hashnode│
-└───┬──┘  │ Beehiiv) │
-    │    └────┬─────┘
-    │         │
-    ▼         ▼
-┌──────────────────┐
-│  SEO & Analytics│
-└──────────────────┘
+  content/blog/*.mdx              https://…substack.com/feed
+          │                                   │
+          │ gray-matter                       │ fetch (revalidate: 3600, tag: substack)
+          │ frontmatter validation            │ fast-xml-parser
+          ▼                                   ▼
+   lib/blog.ts                        lib/sources/substack.ts
+   source: 'local'                    sanitize-html → source: 'substack'
+          │                                   │
+          └───────────────┬───────────────────┘
+                          ▼
+                   lib/content.ts
+        merge · dedupe by slug (local wins) · sort by date
+                          │
+        ┌─────────────────┼──────────────────┬─────────────┐
+        ▼                 ▼                  ▼             ▼
+      /  (home)        /blog          /blog/[slug]     rss · sitemap
 ```
 
-## Directory Structure
+## Why it is shaped this way
 
-### `/app` - Next.js App Router
+**Two sources, one type.** Both paths produce a `BlogPost` carrying a `source`
+discriminator. Pages never branch on origin except at the single render call
+that picks MDX versus sanitised HTML. Adding a third source later means writing
+one adapter, not touching every page.
 
-- **Layout**: Root layout with SEO metadata and analytics
-- **Pages**: Home, About, Blog listing, Blog post pages
-- **API Routes**: RSS feed, sitemap, robots.txt
+**Local MDX wins ties.** Deduping by slug with local priority gives a
+zero-migration upgrade path: publish a quick note on Substack, and later drop
+an MDX file with the same slug to replace it with a fuller article.
 
-### `/components` - React Components
+**The feed never breaks the build.** `getSubstackPosts()` catches everything and
+returns `[]`. A Substack outage during a deploy degrades to "site shows only
+MDX posts", which is a bad afternoon rather than a failed release.
 
-- **Blog Components**: PostCard, TableOfContents, CodeBlock, RelatedPosts, Navigation
-- **Layout Components**: Navbar, Footer
-- **Analytics**: GA4, Clarity, Vercel Analytics integration
+**Third-party HTML is untrusted.** Feed bodies go through `sanitize-html` with
+an allowlist, external links get `rel="noreferrer noopener"`, and Substack's
+tracking pixels are filtered out.
 
-### `/lib` - Core Business Logic
+## Caching
 
-- **Publishers**: Platform-specific publishing adapters
-- **Validators**: Frontmatter validation
-- **Types**: TypeScript type definitions
-- **Blog**: Blog post utilities (getAll, getBySlug, related posts)
-- **Utils**: General utilities (cn, formatDate, calculateReadingTime)
+| Surface | Strategy |
+| --- | --- |
+| `/`, `/blog`, `/blog/[slug]`, RSS, sitemap | ISR, `revalidate = 3600` |
+| Substack feed fetch | Tagged `substack`, same window |
+| `/api/revalidate` | Purges the tag and the two listing paths on demand |
 
-### `/content/blog` - Content Source
+Vercel cron calls the revalidate endpoint every six hours; the manual `?secret=`
+call exists for "I just published and want it live now".
 
-- **MDX Files**: Blog posts with frontmatter
-- **Images**: Cover images and content images
+## Rendering
 
-### `/scripts` - Automation Scripts
+Almost everything is a server component. Client components are limited to three
+places that genuinely need browser APIs:
 
-- **generate-social.ts**: Generate LinkedIn and Twitter drafts
-- **publish.ts**: Publish to all platforms
-- **ping-google.ts**: Ping Google Indexing API
+- `Navbar` — active route + mobile toggle
+- `TableOfContents` — scroll-spy via `IntersectionObserver`
+- `CodeBlock` — clipboard
 
-### `/.github/workflows` - CI/CD
+Headings for the table of contents are extracted from MDX source on the server
+(`lib/headings.ts`, using the same slugger as `rehype-slug`) rather than scraped
+from the DOM after paint. The client component only tracks which one is active.
 
-- **ci.yml**: Lint, type-check, build
-- **publish.yml**: Full publish pipeline
+The pipeline diagram on the home page is CSS keyframes, not JS.
 
-## Key Components
+## SEO
 
-### Publisher Interface
+- Per-post `BlogPosting` JSON-LD
+- `rel="canonical"` on mirrored posts points at Substack, so the original gets
+  the ranking credit instead of competing with the mirror
+- OG images generated at request time from `lib/site.ts` via `next/og`
+- RSS and sitemap built from the merged timeline, so syndicated posts are
+  included
 
-```typescript
-interface Publisher {
-  name: string;
-  publish(post: BlogPost): Promise<PublishResult>;
-  validateConfig(): boolean;
-}
-```
+## Deployment
 
-This interface allows adding new platforms without modifying core logic.
+Vercel Git integration owns deploys. CI only verifies (lint, type-check,
+build). Cross-posting to Hashnode/Beehiiv is a manual `workflow_dispatch`,
+because syndicating is a per-post decision.
 
-### Blog Frontmatter Schema
+## Known limitations
 
-```typescript
-interface BlogFrontmatter {
-  title: string;
-  description: string;
-  tags: string[];
-  categories: string[];
-  coverImage?: string;
-  author: string;
-  publishedDate: string;
-  updatedDate?: string;
-  readingTime?: number;
-  draft?: boolean;
-  canonicalUrl?: string;
-}
-```
-
-### Content Pipeline
-
-1. **Write**: Create MDX file with frontmatter
-2. **Validate**: Frontmatter validation on build
-3. **Build**: Next.js builds static pages
-4. **Generate**: RSS, sitemap, social drafts
-5. **Publish**: Deploy to Vercel, publish to platforms
-6. **Index**: Ping Google Indexing API
-
-## Data Flow
-
-### Publishing Flow
-
-```
-User writes MDX → Git push → GitHub Actions → Validation → Build → 
-Generate Social → Publish Platforms → Deploy → Ping Google
-```
-
-### Reading Flow
-
-```
-User visits site → Next.js serves static page → Analytics track → 
-SEO metadata indexed
-```
-
-## Technology Choices
-
-### Next.js 15 (App Router)
-
-- **Why**: Latest features, server components, improved performance
-- **Benefits**: Built-in optimization, easy deployment, great DX
-
-### TypeScript
-
-- **Why**: Type safety, better IDE support, catch errors early
-- **Benefits**: Maintainability, scalability, developer confidence
-
-### Tailwind CSS
-
-- **Why**: Utility-first, small bundle size, easy customization
-- **Benefits**: Fast development, consistent design, responsive by default
-
-### MDX
-
-- **Why**: Markdown with React components
-- **Benefits**: Rich content, code highlighting, custom components
-
-## Performance Optimization
-
-### Static Generation
-
-- Blog posts are statically generated at build time
-- Only dynamic content uses ISR
-- Sitemap and RSS are generated on-demand
-
-### Image Optimization
-
-- Next.js Image component
-- Automatic WebP/AVIF conversion
-- Responsive images
-
-### Code Splitting
-
-- Automatic route-based splitting
-- Dynamic imports where needed
-- Tree shaking
-
-## Security Considerations
-
-- Environment variables for sensitive data
-- API keys in GitHub Secrets
-- No hardcoded credentials
-- Input validation
-- Content sanitization
-
-## Scalability
-
-The system is designed to scale to thousands of articles:
-
-- **Static Generation**: Fast page loads regardless of content size
-- **Incremental Builds**: Only rebuild changed content
-- **CDN**: Vercel's global CDN
-- **Database-Free**: File-based content for simplicity
-
-## Future Enhancements
-
-1. **Search Integration**: Add Algolia or local search
-2. **Comments**: Add commenting system (giscus, utterances)
-3. **Newsletter**: Custom newsletter management
-4. **Analytics Dashboard**: Custom analytics dashboard
-5. **More Platforms**: Medium, Dev.to, etc.
-6. **AI Content**: AI-powered content suggestions
-7. **A/B Testing**: Test different headlines, layouts
-
-## Monitoring
-
-- **Vercel Analytics**: Page views, Core Web Vitals
-- **Google Analytics**: User behavior, traffic sources
-- **Microsoft Clarity**: User recordings, heatmaps
-- **GitHub Actions**: Build and deployment status
-
-## Backup Strategy
-
-- **Git**: Content versioned in Git
-- **Vercel**: Automatic deployments
-- **Platforms**: Content syndicated to multiple platforms
-- **RSS**: Feed serves as backup for subscribers
-
-## Disaster Recovery
-
-- **Git History**: Rollback to any version
-- **Vercel Rollbacks**: One-click rollback
-- **Platform APIs**: Can republish from MDX files
-- **CDN Cache**: Automatic cache invalidation on deploy
+- **No table of contents on mirrored posts.** Substack's HTML has no stable
+  heading ids. Fixing it means slugging headings during sanitisation.
+- **Feed depth.** Substack RSS returns only recent items, so older essays will
+  not appear unless written up as MDX.
+- **No search.** Fine at current post counts; revisit past ~50 posts.
+- **Tags are display-only.** There are no `/tags/[tag]` routes yet.
