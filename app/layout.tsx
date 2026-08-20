@@ -1,68 +1,82 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Inter, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import { Analytics } from '@/components/Analytics';
+import { site } from '@/lib/site';
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-inter',
+});
+
+const mono = JetBrains_Mono({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-mono-face',
+});
+
+const title = `${site.name} — ${site.role}`;
 
 export const metadata: Metadata = {
-  title: 'Ankit Mohan Pandey - Senior Data Engineer',
-  description: 'Senior Data Engineer specializing in GCP, Apache Beam, Airflow, and BigQuery',
-  keywords: ['Data Engineering', 'GCP', 'Apache Beam', 'Airflow', 'BigQuery', 'Data Pipeline'],
-  authors: [{ name: 'Ankit Mohan Pandey' }],
+  metadataBase: new URL(site.url),
+  title: {
+    default: title,
+    template: `%s — ${site.name}`,
+  },
+  description: site.description,
+  keywords: [
+    'Data Engineering',
+    'GCP',
+    'Apache Beam',
+    'Apache Flink',
+    'Airflow',
+    'BigQuery',
+    'Streaming',
+    'Data Pipelines',
+  ],
+  authors: [{ name: site.name, url: site.url }],
+  creator: site.name,
+  alternates: {
+    canonical: '/',
+    types: { 'application/rss+xml': `${site.url}/rss.xml` },
+  },
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://ankitmohanpandey.in',
-    siteName: 'Ankit Mohan Pandey',
-    title: 'Ankit Mohan Pandey - Senior Data Engineer',
-    description: 'Senior Data Engineer specializing in GCP, Apache Beam, Airflow, and BigQuery',
-    images: [
-      {
-        url: 'https://ankitmohanpandey.in/og-image.png',
-        width: 1200,
-        height: 630,
-        alt: 'Ankit Mohan Pandey',
-      },
-    ],
+    url: site.url,
+    siteName: site.name,
+    title,
+    description: site.description,
+    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: site.name }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Ankit Mohan Pandey - Senior Data Engineer',
-    description: 'Senior Data Engineer specializing in GCP, Apache Beam, Airflow, and BigQuery',
-    images: ['https://ankitmohanpandey.in/og-image.png'],
-    creator: '@ankitmohanpandey',
+    title,
+    description: site.description,
+    images: ['/og-image.png'],
   },
   robots: {
     index: true,
     follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
-    },
-  },
-  verification: {
-    google: process.env.GOOGLE_SITE_VERIFICATION,
+    googleBot: { index: true, follow: true, 'max-image-preview': 'large' },
   },
 };
 
 export default function RootLayout({
   children,
-}: {
-  children: React.ReactNode;
-}) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
-      <head>
-        <link rel="icon" href="/favicon.ico" />
-        <link rel="canonical" href="https://ankitmohanpandey.in" />
-      </head>
-      <body className={inter.className}>
-        <Analytics />
+    <html lang="en" className={`${inter.variable} ${mono.variable}`}>
+      <body className="antialiased">
+        <a
+          href="#main"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-100 focus:rounded-md focus:bg-surface focus:px-4 focus:py-2 focus:text-sm"
+        >
+          Skip to content
+        </a>
         {children}
+        <Analytics />
       </body>
     </html>
   );

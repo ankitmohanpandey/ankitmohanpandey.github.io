@@ -23,6 +23,10 @@
 # misc
 .DS_Store
 *.pem
+*.zip
+
+# generated social drafts
+/social
 
 # debug
 npm-debug.log*
