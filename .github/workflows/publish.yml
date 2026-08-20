@@ -1,12 +1,18 @@
-name: Publish Pipeline
+name: Syndicate
 
+# Deployment is handled by Vercel's Git integration, so this workflow only
+# covers optional cross-posting. It is manual by design: syndicating is a
+# decision per post, not something every push should trigger.
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
+    inputs:
+      ping_google:
+        description: 'Also ping the Google Indexing API'
+        type: boolean
+        default: true
 
 jobs:
-  validate:
+  syndicate:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -15,81 +21,26 @@ jobs:
           node-version: '20'
           cache: 'npm'
       - run: npm ci
-      - run: npm run type-check
-      - run: npm run lint
 
-  generate-social:
-    runs-on: ubuntu-latest
-    needs: validate
-    outputs:
-      has_posts: ${{ steps.check-social.outputs.has_posts }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-      - run: npm ci
-      - run: npx tsx scripts/generate-social.ts
-      - name: Check if social posts were generated
-        id: check-social
-        run: |
-          if [ -d "social" ] && [ "$(ls -A social)" ]; then
-            echo "has_posts=true" >> $GITHUB_OUTPUT
-          else
-            echo "has_posts=false" >> $GITHUB_OUTPUT
-          fi
+      - name: Generate social drafts
+        run: npx tsx scripts/generate-social.ts
+
       - uses: actions/upload-artifact@v4
-        if: steps.check-social.outputs.has_posts == 'true'
         with:
-          name: social-posts
+          name: social-drafts
           path: social/
+          if-no-files-found: ignore
 
-  publish-platforms:
-    runs-on: ubuntu-latest
-    needs: [validate, generate-social]
-    if: needs.generate-social.outputs.has_posts == 'true'
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-      - run: npm ci
-      - uses: actions/download-artifact@v4
-        with:
-          name: social-posts
-          path: social/
-      - env:
+      - name: Publish to platforms
+        env:
           HASHNODE_API_KEY: ${{ secrets.HASHNODE_API_KEY }}
           HASHNODE_PUBLICATION_ID: ${{ secrets.HASHNODE_PUBLICATION_ID }}
           BEEHIIV_API_KEY: ${{ secrets.BEEHIIV_API_KEY }}
           BEEHIIV_PUBLICATION_ID: ${{ secrets.BEEHIIV_PUBLICATION_ID }}
         run: npx tsx scripts/publish.ts
 
-  deploy:
-    runs-on: ubuntu-latest
-    needs: [validate]
-    continue-on-error: true
-    steps:
-      - uses: actions/checkout@v4
-      - uses: amondnet/vercel-action@v25
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          vercel-args: '--prod'
-
-  notify-google:
-    runs-on: ubuntu-latest
-    needs: [validate]
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-      - run: npm ci
-      - env:
+      - name: Ping Google
+        if: inputs.ping_google
+        env:
           GOOGLE_INDEXING_API_KEY: ${{ secrets.GOOGLE_INDEXING_API_KEY }}
         run: npx tsx scripts/ping-google.ts
