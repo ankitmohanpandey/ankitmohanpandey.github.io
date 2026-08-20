@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { BlogPost } from '@/lib/types/blog';
+import { cn } from '@/lib/utils';
 
 interface PostNavigationProps {
   previous: BlogPost | null;
@@ -7,32 +8,37 @@ interface PostNavigationProps {
 }
 
 export function PostNavigation({ previous, next }: PostNavigationProps) {
+  if (!previous && !next) return null;
+
   return (
-    <div className="mt-12 grid grid-cols-1 gap-4 md:grid-cols-2">
+    <nav className="mt-12 grid gap-3 sm:grid-cols-2">
       {previous && (
         <Link
           href={`/blog/${previous.slug}`}
-          className="rounded-lg border border-gray-800 bg-gray-900/50 p-6 transition-all hover:border-gray-700 hover:bg-gray-900/80"
+          className="group rounded-lg border border-line bg-surface/40 p-5 transition-colors hover:border-line-strong"
         >
-          <div className="text-sm text-gray-400">← Previous</div>
-          <h3 className="mt-2 font-semibold text-white">
+          <div className="font-mono text-[11px] text-dim">← newer</div>
+          <div className="mt-2 font-medium text-fg transition-colors group-hover:text-signal">
             {previous.frontmatter.title}
-          </h3>
+          </div>
         </Link>
       )}
+
       {next && (
         <Link
           href={`/blog/${next.slug}`}
-          className={`rounded-lg border border-gray-800 bg-gray-900/50 p-6 transition-all hover:border-gray-700 hover:bg-gray-900/80 ${
-            !previous ? 'md:col-start-2' : ''
-          }`}
+          className={cn(
+            'group rounded-lg border border-line bg-surface/40 p-5 transition-colors hover:border-line-strong',
+            !previous && 'sm:col-start-2',
+            'sm:text-right'
+          )}
         >
-          <div className="text-sm text-gray-400">Next →</div>
-          <h3 className="mt-2 font-semibold text-white">
+          <div className="font-mono text-[11px] text-dim">older →</div>
+          <div className="mt-2 font-medium text-fg transition-colors group-hover:text-signal">
             {next.frontmatter.title}
-          </h3>
+          </div>
         </Link>
       )}
-    </div>
+    </nav>
   );
 }

@@ -1,61 +1,62 @@
-import { Navbar } from '@/components/Navbar';
-import { Footer } from '@/components/Footer';
-import { getAllBlogPosts } from '@/lib/blog';
-import { PostCard } from '@/components/blog/PostCard';
 import Link from 'next/link';
+import { Shell, Container, SectionHeading } from '@/components/Shell';
+import { Hero } from '@/components/home/Hero';
+import { Capabilities } from '@/components/home/Capabilities';
+import { Work } from '@/components/home/Work';
+import { Subscribe } from '@/components/Subscribe';
+import { PostCard } from '@/components/blog/PostCard';
+import { getAllPosts } from '@/lib/content';
 
-export default function HomePage() {
-  const posts = getAllBlogPosts().slice(0, 3);
+/** Rebuild hourly so newly published Substack essays appear without a deploy. */
+export const revalidate = 3600;
+
+export default async function HomePage() {
+  const posts = (await getAllPosts()).slice(0, 4);
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
-      <Navbar />
-      
-      <main className="container mx-auto px-4 py-16">
-        <section className="text-center mb-16">
-          <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-            Ankit Mohan Pandey
-          </h1>
-          <p className="text-xl text-gray-400 mb-8">
-            Senior Data Engineer specializing in GCP, Apache Beam, Airflow, and BigQuery
-          </p>
-          <div className="flex gap-4 justify-center">
+    <Shell>
+      <Hero />
+
+      <Container className="py-20">
+        <SectionHeading eyebrow="what I do" title="Areas I go deep on" />
+        <Capabilities />
+      </Container>
+
+      <Container className="py-8">
+        <SectionHeading eyebrow="selected work" title="Things I've built" />
+        <Work />
+      </Container>
+
+      <Container className="py-20">
+        <SectionHeading
+          eyebrow="writing"
+          title="Latest posts"
+          action={
             <Link
               href="/blog"
-              className="px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
+              className="shrink-0 font-mono text-sm text-dim transition-colors hover:text-signal"
             >
-              Read Blog
+              all posts →
             </Link>
-            <Link
-              href="/about"
-              className="px-6 py-3 border border-gray-700 hover:border-gray-600 rounded-lg transition-colors"
-            >
-              About Me
-            </Link>
-          </div>
-        </section>
+          }
+        />
 
-        <section>
-          <h2 className="text-3xl font-bold mb-8">Latest Posts</h2>
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {posts.length === 0 ? (
+          <p className="font-mono text-sm text-dim">
+            Nothing published yet — check back soon.
+          </p>
+        ) : (
+          <div className="border-t border-line">
             {posts.map((post) => (
               <PostCard key={post.slug} post={post} />
             ))}
           </div>
-          {posts.length > 0 && (
-            <div className="text-center mt-8">
-              <Link
-                href="/blog"
-                className="text-blue-400 hover:text-blue-300 transition-colors"
-              >
-                View all posts →
-              </Link>
-            </div>
-          )}
-        </section>
-      </main>
+        )}
+      </Container>
 
-      <Footer />
-    </div>
+      <Container className="pb-8">
+        <Subscribe />
+      </Container>
+    </Shell>
   );
 }

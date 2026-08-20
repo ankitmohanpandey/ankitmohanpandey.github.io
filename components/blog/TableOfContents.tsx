@@ -1,67 +1,31 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
-
-interface Heading {
-  id: string;
-  text: string;
-  level: number;
-}
+import { useEffect, useState } from 'react';
+import type { Heading } from '@/lib/headings';
+import { cn } from '@/lib/utils';
 
 interface TableOfContentsProps {
-  content: string;
+  headings: Heading[];
 }
 
-export function TableOfContents({ content }: TableOfContentsProps) {
-  const [headings, setHeadings] = useState<Heading[]>([]);
-  const [activeId, setActiveId] = useState<string>('');
-  const isMounted = useRef(false);
+export function TableOfContents({ headings }: TableOfContentsProps) {
+  const [activeId, setActiveId] = useState('');
 
   useEffect(() => {
-    isMounted.current = true;
-    return () => {
-      isMounted.current = false;
-    };
-  }, []);
+    if (headings.length === 0) return;
 
-  useEffect(() => {
-    if (!isMounted.current) return;
-
-    const timer = setTimeout(() => {
-      const headingElements = Array.from(
-        document.querySelectorAll('h1, h2, h3, h4, h5, h6')
-      );
-
-      const extractedHeadings = headingElements.map((heading) => ({
-        id: heading.id,
-        text: heading.textContent || '',
-        level: parseInt(heading.tagName.charAt(1)),
-      }));
-
-      if (isMounted.current) {
-        setHeadings(extractedHeadings);
-      }
-    }, 100);
-
-    return () => clearTimeout(timer);
-  }, [content]);
-
-  useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveId(entry.target.id);
-          }
-        });
+        const visible = entries.filter((entry) => entry.isIntersecting);
+        if (visible.length > 0) setActiveId(visible[0].target.id);
       },
-      { rootMargin: '-20% 0% -35% 0%' }
+      { rootMargin: '-15% 0px -70% 0px' }
     );
 
-    headings.forEach(({ id }) => {
+    for (const { id } of headings) {
       const element = document.getElementById(id);
       if (element) observer.observe(element);
-    });
+    }
 
     return () => observer.disconnect();
   }, [headings]);
@@ -69,21 +33,20 @@ export function TableOfContents({ content }: TableOfContentsProps) {
   if (headings.length === 0) return null;
 
   return (
-    <nav className="sticky top-4 hidden rounded-lg border border-gray-800 bg-gray-900/50 p-4 lg:block">
-      <h4 className="mb-4 text-sm font-semibold text-gray-300">
-        Table of Contents
-      </h4>
-      <ul className="space-y-2 text-sm">
+    <nav className="sticky top-24">
+      <div className="eyebrow mb-3">on this page</div>
+      <ul className="space-y-1 border-l border-line">
         {headings.map((heading) => (
-          <li
-            key={heading.id}
-            style={{ paddingLeft: `${(heading.level - 1) * 12}px` }}
-          >
+          <li key={heading.id}>
             <a
               href={`#${heading.id}`}
-              className={`block text-gray-400 transition-colors hover:text-white ${
-                activeId === heading.id ? 'text-white font-medium' : ''
-              }`}
+              className={cn(
+                '-ml-px block border-l py-1 text-sm leading-snug transition-colors',
+                heading.level === 3 ? 'pl-6' : 'pl-4',
+                activeId === heading.id
+                  ? 'border-signal text-fg'
+                  : 'border-transparent text-dim hover:text-muted'
+              )}
             >
               {heading.text}
             </a>

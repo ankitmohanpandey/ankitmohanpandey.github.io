@@ -1,49 +1,104 @@
-import { Navbar } from '@/components/Navbar';
-import { Footer } from '@/components/Footer';
+import type { Metadata } from 'next';
+import { Shell, Container } from '@/components/Shell';
+import { Capabilities } from '@/components/home/Capabilities';
+import { site } from '@/lib/site';
+
+export const metadata: Metadata = {
+  title: 'About',
+  description: site.description,
+};
+
+const principles = [
+  {
+    title: 'Correctness before throughput',
+    body: 'A fast pipeline that silently drops late events is worse than a slow one that does not. Event-time semantics, watermarks and dead letter queues are not optional extras.',
+  },
+  {
+    title: 'Failure is the normal case',
+    body: 'Brokers restart, schemas drift, upstream teams ship breaking changes on a Friday. Designs get judged on what happens during the incident, not the happy path.',
+  },
+  {
+    title: 'Make it runnable in one command',
+    body: 'If a new engineer cannot bring the whole stack up locally, the system is harder than it needs to be. Containerised environments pay for themselves within a week.',
+  },
+  {
+    title: 'Cost is a design constraint',
+    body: 'Partitioning, clustering and materialisation choices show up on the invoice. Warehouse design is as much an economics problem as an engineering one.',
+  },
+];
+
+const contact = [
+  { label: 'email', value: site.email, href: `mailto:${site.email}` },
+  { label: 'github', value: '@ankitmohanpandey', href: site.socials.github },
+  { label: 'linkedin', value: '/in/ankitmohanpandey', href: site.socials.linkedin },
+  { label: 'substack', value: 'ankitmohanpandey', href: site.socials.substack },
+];
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
-      <Navbar />
-      
-      <main className="container mx-auto px-4 py-16">
-        <div className="max-w-3xl mx-auto">
-          <h1 className="text-4xl font-bold mb-8">About Me</h1>
-          
-          <div className="prose prose-invert">
-            <p className="text-xl text-gray-300 mb-6">
-              I&apos;m a Senior Data Engineer with expertise in building scalable data pipelines
-              and distributed systems on Google Cloud Platform.
+    <Shell>
+      <Container className="py-16 sm:py-20">
+        <header className="border-b border-line pb-10">
+          <div className="eyebrow">about</div>
+          <h1 className="mt-3 max-w-3xl text-balance text-4xl font-semibold leading-tight tracking-tight text-bright">
+            Data engineer, mostly on the streaming side
+          </h1>
+          <div className="mt-6 max-w-2xl space-y-4 text-muted">
+            <p>
+              I design and run the pipelines that move data from wherever it is
+              produced to wherever someone needs to make a decision with it —
+              usually on Google Cloud, usually with Apache Beam or Flink doing the
+              heavy lifting and Airflow keeping the schedule honest.
             </p>
-
-            <h2 className="text-2xl font-bold mt-8 mb-4">Technical Expertise</h2>
-            <ul className="space-y-2 text-gray-300">
-              <li>• Google Cloud Platform (GCP)</li>
-              <li>• Apache Beam for data processing</li>
-              <li>• Apache Airflow for workflow orchestration</li>
-              <li>• BigQuery for data warehousing</li>
-              <li>• Dataflow for streaming and batch processing</li>
-              <li>• Cloud Pub/Sub for event-driven architectures</li>
-            </ul>
-
-            <h2 className="text-2xl font-bold mt-8 mb-4">What I Do</h2>
-            <p className="text-gray-300">
-              I design and implement robust data engineering solutions that handle
-              massive scale while maintaining data quality and reliability. My work
-              focuses on building efficient data pipelines, optimizing query performance,
-              and ensuring data governance best practices.
-            </p>
-
-            <h2 className="text-2xl font-bold mt-8 mb-4">Get in Touch</h2>
-            <p className="text-gray-300">
-              Feel free to reach out for collaborations, discussions about data engineering,
-              or just to say hello!
+            <p>
+              Most of my interesting work happens at the boundaries: late-arriving
+              events, schema evolution, replaying a day of data without producing
+              duplicates, keeping BigQuery costs from quietly tripling. That is the
+              part I write about.
             </p>
           </div>
-        </div>
-      </main>
+        </header>
 
-      <Footer />
-    </div>
+        <section className="py-14">
+          <div className="eyebrow mb-6">how I work</div>
+          <div className="grid gap-px overflow-hidden rounded-xl border border-line bg-line sm:grid-cols-2">
+            {principles.map((item) => (
+              <div key={item.title} className="bg-base p-6">
+                <h3 className="font-semibold text-bright">{item.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted">{item.body}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="pb-14">
+          <div className="eyebrow mb-6">toolkit</div>
+          <Capabilities />
+        </section>
+
+        <section className="border-t border-line pt-10">
+          <div className="eyebrow mb-6">get in touch</div>
+          <dl className="grid gap-4 sm:grid-cols-2">
+            {contact.map((item) => (
+              <div key={item.label} className="flex items-baseline gap-4">
+                <dt className="w-20 shrink-0 font-mono text-[11px] text-dim">
+                  {item.label}
+                </dt>
+                <dd>
+                  <a
+                    href={item.href}
+                    target={item.href.startsWith('mailto') ? undefined : '_blank'}
+                    rel="noreferrer noopener"
+                    className="font-mono text-sm text-fg transition-colors hover:text-signal"
+                  >
+                    {item.value}
+                  </a>
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+      </Container>
+    </Shell>
   );
 }

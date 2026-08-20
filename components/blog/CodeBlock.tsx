@@ -1,40 +1,34 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 interface CodeBlockProps {
-  children: React.ReactNode;
-  className?: string;
+  children?: React.ReactNode;
 }
 
-export function CodeBlock({ children, className = '' }: CodeBlockProps) {
+export function CodeBlock({ children }: CodeBlockProps) {
+  const ref = useRef<HTMLPreElement>(null);
   const [copied, setCopied] = useState(false);
 
+  // Read the rendered text instead of the React children, which are nested
+  // highlight.js spans rather than a plain string.
   const handleCopy = async () => {
-    const codeText = String(children) || '';
-    await navigator.clipboard.writeText(codeText);
+    const text = ref.current?.innerText ?? '';
+    await navigator.clipboard.writeText(text);
     setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    setTimeout(() => setCopied(false), 1800);
   };
 
-  const language = className.replace(/language-/, '') || 'code';
-
   return (
-    <div className="relative group">
-      <div className="absolute right-2 top-2 flex gap-2 opacity-0 transition-opacity group-hover:opacity-100">
-        <span className="rounded bg-gray-800 px-2 py-1 text-xs text-gray-400">
-          {language}
-        </span>
-        <button
-          onClick={handleCopy}
-          className="rounded bg-gray-800 px-2 py-1 text-xs text-gray-400 hover:bg-gray-700 hover:text-white"
-        >
-          {copied ? 'Copied!' : 'Copy'}
-        </button>
-      </div>
-      <pre className="rounded-lg bg-gray-900 p-4">
-        <code className={className}>{children}</code>
-      </pre>
+    <div className="group relative">
+      <button
+        type="button"
+        onClick={handleCopy}
+        className="absolute right-3 top-3 rounded border border-line bg-raised px-2 py-1 font-mono text-[11px] text-dim opacity-0 transition-all hover:text-signal focus-visible:opacity-100 group-hover:opacity-100"
+      >
+        {copied ? 'copied' : 'copy'}
+      </button>
+      <pre ref={ref}>{children}</pre>
     </div>
   );
 }
