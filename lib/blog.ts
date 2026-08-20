@@ -7,103 +7,49 @@ import { calculateReadingTime } from './utils';
 
 const contentDirectory = path.join(process.cwd(), 'content/blog');
 
+function readPost(fileName: string): BlogPost {
+  const slug = fileName.replace(/\.mdx$/, '');
+  const fileContents = fs.readFileSync(path.join(contentDirectory, fileName), 'utf8');
+  const { data, content } = matter(fileContents);
+
+  return {
+    slug,
+    frontmatter: validateBlogFrontmatter(data),
+    content,
+    readingTime: calculateReadingTime(content),
+    source: 'local',
+  };
+}
+
+/** Posts authored as MDX in this repo, newest first, drafts excluded. */
 export function getAllBlogPosts(): BlogPost[] {
   if (!fs.existsSync(contentDirectory)) {
     return [];
   }
 
-  const fileNames = fs.readdirSync(contentDirectory);
-  const allPostsData = fileNames
+  return fs
+    .readdirSync(contentDirectory)
     .filter((fileName) => fileName.endsWith('.mdx'))
-    .map((fileName) => {
-      const slug = fileName.replace(/\.mdx$/, '');
-      const fullPath = path.join(contentDirectory, fileName);
-      const fileContents = fs.readFileSync(fullPath, 'utf8');
-      const { data, content } = matter(fileContents);
-
-      const frontmatter = validateBlogFrontmatter(data);
-      const readingTime = calculateReadingTime(content);
-
-      return {
-        slug,
-        frontmatter,
-        content,
-        readingTime,
-      };
-    })
+    .map(readPost)
     .filter((post) => !post.frontmatter.draft)
-    .sort((a, b) => {
-      const dateA = new Date(a.frontmatter.publishedDate);
-      const dateB = new Date(b.frontmatter.publishedDate);
-      return dateB.getTime() - dateA.getTime();
-    });
-
-  return allPostsData;
+    .sort(
+      (a, b) =>
+        new Date(b.frontmatter.publishedDate).getTime() -
+        new Date(a.frontmatter.publishedDate).getTime()
+    );
 }
 
 export function getBlogPostBySlug(slug: string): BlogPost | null {
+  const fullPath = path.join(contentDirectory, `${slug}.mdx`);
+
+  if (!fs.existsSync(fullPath)) {
+    return null;
+  }
+
   try {
-    const fullPath = path.join(contentDirectory, `${slug}.mdx`);
-    
-    if (!fs.existsSync(fullPath)) {
-      return null;
-    }
-
-    const fileContents = fs.readFileSync(fullPath, 'utf8');
-    const { data, content } = matter(fileContents);
-
-    const frontmatter = validateBlogFrontmatter(data);
-    const readingTime = calculateReadingTime(content);
-
-    return {
-      slug,
-      frontmatter,
-      content,
-      readingTime,
-    };
+    return readPost(`${slug}.mdx`);
   } catch (error) {
     console.error(`Error reading blog post ${slug}:`, error);
     return null;
   }
-}
-
-export function getRelatedPosts(currentSlug: string, limit = 3): BlogPost[] {
-  const allPosts = getAllBlogPosts();
-  const currentPost = getBlogPostBySlug(currentSlug);
-
-  if (!currentPost) {
-    return [];
-  }
-
-  const relatedPosts = allPosts
-    .filter((post) => post.slug !== currentSlug)
-    .filter((post) => {
-      const hasMatchingTag = post.frontmatter.tags.some((tag) =>
-        currentPost.frontmatter.tags.includes(tag)
-      );
-      const hasMatchingCategory = post.frontmatter.categories.some((category) =>
-        currentPost.frontmatter.categories.includes(category)
-      );
-      return hasMatchingTag || hasMatchingCategory;
-    })
-    .slice(0, limit);
-
-  return relatedPosts;
-}
-
-export function getPreviousAndNextPost(currentSlug: string): {
-  previous: BlogPost | null;
-  next: BlogPost | null;
-} {
-  const allPosts = getAllBlogPosts();
-  const currentIndex = allPosts.findIndex((post) => post.slug === currentSlug);
-
-  if (currentIndex === -1) {
-    return { previous: null, next: null };
-  }
-
-  return {
-    previous: currentIndex > 0 ? allPosts[currentIndex - 1] : null,
-    next: currentIndex < allPosts.length - 1 ? allPosts[currentIndex + 1] : null,
-  };
 }

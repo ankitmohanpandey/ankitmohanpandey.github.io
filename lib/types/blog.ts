@@ -12,11 +12,20 @@ export interface BlogFrontmatter {
   canonicalUrl?: string;
 }
 
+/** Where a post's body came from, which decides how it gets rendered. */
+export type PostSource = 'local' | 'substack';
+
 export interface BlogPost {
   slug: string;
   frontmatter: BlogFrontmatter;
+  /** MDX source for local posts; empty for syndicated ones. */
   content: string;
   readingTime: number;
+  source: PostSource;
+  /** Sanitised HTML body, only present for syndicated posts. */
+  html?: string;
+  /** Canonical link on the originating platform. */
+  externalUrl?: string;
 }
 
 export interface SocialPost {
