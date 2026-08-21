@@ -16,9 +16,12 @@ npm run dev        # http://localhost:3000
 | `npm run build` | Production build |
 | `npm run lint` | ESLint |
 | `npm run type-check` | `tsc --noEmit` |
+| `npm run check:budget` | Fail if client JS exceeds the gzip budget (needs a build first) |
 | `npm run generate-social` | Write LinkedIn/X drafts to `social/` |
 
-CI runs lint, type-check and build on every push and PR.
+CI runs lint, type-check, build, the bundle budget and `npm audit` on every
+push and PR. Lighthouse runs on PRs with score and Core Web Vitals assertions
+from `lighthouserc.json`.
 
 ## How content works
 
@@ -85,16 +88,64 @@ out of listings.
 Vercel's Git integration builds and deploys `main`. There is no deploy step in
 CI on purpose — one system owns deployment.
 
-Domain setup:
-
-1. Add `ankitmohanpandey.in` in the Vercel project's Domains tab.
-2. Point the apex record at Vercel per the instructions it gives you.
-3. Disable GitHub Pages on this repo.
-
 > [!IMPORTANT]
-> This repo is named `ankitmohanpandey.github.io`, so GitHub Pages will try to
-> serve it. The static HTML it used to serve has been deleted. Turn Pages off,
-> or it will publish a broken site alongside the real one.
+> This repo is named `ankitmohanpandey.github.io`, so GitHub Pages wants to
+> serve it, and the static HTML it used to serve has been deleted. Do the
+> Vercel setup below **before** pushing, or the domain will 404 in the gap.
+
+### First-time setup
+
+1. **Create the project.** At [vercel.com/new](https://vercel.com/new), import
+   `ankitmohanpandey/ankitmohanpandey.github.io`. Framework detection picks
+   Next.js; leave the build settings alone.
+
+2. **Add environment variables** (Settings → Environment Variables), for
+   Production *and* Preview:
+
+   ```
+   REVALIDATE_SECRET   <openssl rand -hex 32>
+   CRON_SECRET         <the same value>
+   ```
+
+   `NEXT_PUBLIC_GA_ID` and `NEXT_PUBLIC_CLARITY_ID` are optional; without them
+   no third-party scripts load at all.
+
+3. **Deploy** and confirm the `*.vercel.app` URL works, including a mirrored
+   Substack post at `/blog/...`.
+
+4. **Attach the domain.** Settings → Domains → add `ankitmohanpandey.in` and
+   `www.ankitmohanpandey.in`, then set the DNS records Vercel shows you at your
+   registrar. Wait for the certificate to issue.
+
+5. **Turn GitHub Pages off.** Repo Settings → Pages → Source: *None*. Then
+   delete the now-meaningless `CNAME` file.
+
+6. **Protect the branch.** Repo Settings → Rules → require the `verify` and
+   `audit` checks before merging to `main`.
+
+### Verifying a deploy
+
+```bash
+curl -sI https://ankitmohanpandey.in | grep -i content-security-policy
+curl -s https://ankitmohanpandey.in/rss.xml | head
+curl "https://ankitmohanpandey.in/api/revalidate?secret=$REVALIDATE_SECRET"
+```
+
+## Security posture
+
+- **Headers** are defined once in `next.config.ts`: CSP, HSTS with preload,
+  `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`, COOP,
+  `nosniff`. `x-powered-by` is disabled.
+- **CSP** allows `'unsafe-inline'` on `script-src` only, because Next emits
+  inline bootstrap scripts on prerendered pages. Eliminating it needs
+  per-request nonces, which would force every route out of static generation.
+  For a site with no auth and no user-submitted HTML that is a bad trade — but
+  it is a deliberate one, not an oversight.
+- **Third-party HTML** from Substack is run through `sanitize-html` with a tag
+  and attribute allowlist before it is rendered.
+- **Dependencies** are watched by Dependabot with a 7-day cooldown, so freshly
+  published versions are never auto-adopted. CI fails on high-severity
+  advisories.
 
 ## Editing site content
 

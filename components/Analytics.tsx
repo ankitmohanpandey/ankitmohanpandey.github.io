@@ -1,52 +1,36 @@
-'use client';
+import Script from 'next/script';
 
-import { useEffect } from 'react';
+const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
+const CLARITY_ID = process.env.NEXT_PUBLIC_CLARITY_ID;
 
-declare global {
-  interface Window {
-    dataLayer: unknown[];
-    gtag: (...args: unknown[]) => void;
-  }
-}
-
+/**
+ * Loaded through next/script rather than hand-rolled document.createElement
+ * calls, so Next controls load ordering and the tags are covered by the CSP
+ * allowlist in next.config.ts. Renders nothing when the ids are unset, which
+ * keeps local development free of third-party requests.
+ */
 export function Analytics() {
-  useEffect(() => {
-    // Google Analytics 4
-    if (process.env.NEXT_PUBLIC_GA_ID) {
-      const script = document.createElement('script');
-      script.src = `https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`;
-      script.async = true;
-      document.head.appendChild(script);
+  if (!GA_ID && !CLARITY_ID) return null;
 
-      window.dataLayer = window.dataLayer || [];
-      window.gtag = function gtag(...args: unknown[]) {
-        window.dataLayer.push(args);
-      };
-      window.gtag('js', new Date());
-      window.gtag('config', process.env.NEXT_PUBLIC_GA_ID);
-    }
+  return (
+    <>
+      {GA_ID && (
+        <>
+          <Script
+            src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
+            strategy="afterInteractive"
+          />
+          <Script id="ga-init" strategy="afterInteractive">
+            {`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${GA_ID}',{anonymize_ip:true});`}
+          </Script>
+        </>
+      )}
 
-    // Microsoft Clarity
-    if (process.env.NEXT_PUBLIC_CLARITY_ID) {
-      const script = document.createElement('script');
-      script.innerHTML = `
-        (function(c,l,a,r,i,t,y){
-          c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-        })(window, document, "clarity", "script", "${process.env.NEXT_PUBLIC_CLARITY_ID}");
-      `;
-      document.head.appendChild(script);
-    }
-
-    // Vercel Analytics
-    if (process.env.NEXT_PUBLIC_VERCEL_ANALYTICS_ID) {
-      const script = document.createElement('script');
-      script.src = `https://analytics.vercel-scripts.com/${process.env.NEXT_PUBLIC_VERCEL_ANALYTICS_ID}`;
-      script.defer = true;
-      document.head.appendChild(script);
-    }
-  }, []);
-
-  return null;
+      {CLARITY_ID && (
+        <Script id="clarity-init" strategy="afterInteractive">
+          {`(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","${CLARITY_ID}");`}
+        </Script>
+      )}
+    </>
+  );
 }
