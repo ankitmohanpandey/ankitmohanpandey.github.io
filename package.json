@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "type-check": "tsc --noEmit",
+    "check:budget": "npx tsx scripts/check-budget.ts",
     "publish": "npx tsx scripts/publish.ts",
     "generate-social": "npx tsx scripts/generate-social.ts"
   },
@@ -21,7 +22,7 @@
     "fast-xml-parser": "^5.11.0",
     "github-slugger": "^2.0.0",
     "gray-matter": "^4.0.3",
-    "next": "16.2.9",
+    "next": "^16.3.1",
     "next-mdx-remote": "^6.0.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",
@@ -43,7 +44,7 @@
     "@types/react-dom": "^19",
     "@types/sanitize-html": "^2.16.1",
     "eslint": "^9",
-    "eslint-config-next": "16.2.9",
+    "eslint-config-next": "^16.3.1",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
