@@ -1,61 +1,39 @@
-const stages = [
-  { label: 'sources', detail: 'pub/sub · kafka · cdc' },
-  { label: 'ingest', detail: 'beam · flink' },
-  { label: 'transform', detail: 'windows · joins · dq' },
-  { label: 'serve', detail: 'bigquery · api' },
+import { StreamViz } from '@/components/home/StreamViz';
+
+const facts = [
+  { k: 'semantics', v: 'event-time' },
+  { k: 'delivery', v: 'exactly-once' },
+  { k: 'on failure', v: 'replay' },
 ];
 
-/**
- * Purely decorative pipeline diagram. CSS-only so it costs no client JS —
- * the staggered pulses read as records moving between stages.
- */
 export function Pipeline() {
   return (
-    <div
-      aria-hidden
-      className="rounded-xl border border-line bg-surface/60 p-5 sm:p-6"
-    >
-      <div className="mb-5 flex items-center gap-2 font-mono text-[11px] text-dim">
-        <span className="size-1.5 rounded-full bg-signal animate-flow" />
-        streaming topology · exactly-once
-      </div>
+    <div className="group relative">
+      {/* Accent bloom that intensifies on hover. */}
+      <div className="absolute -inset-px rounded-xl bg-gradient-to-br from-signal/25 via-flow/10 to-transparent opacity-40 blur-[2px] transition-opacity duration-500 group-hover:opacity-80" />
 
-      <div className="flex items-stretch gap-2 overflow-x-auto pb-1">
-        {stages.map((stage, index) => (
-          <div key={stage.label} className="flex min-w-0 flex-1 items-center gap-2">
-            <div className="min-w-0 flex-1 rounded-lg border border-line-strong bg-base px-3 py-3">
-              <div className="truncate font-mono text-xs text-fg">{stage.label}</div>
-              <div className="mt-1 truncate font-mono text-[10px] text-dim">
-                {stage.detail}
-              </div>
+      <div className="relative overflow-hidden rounded-xl border border-line-strong bg-surface/90 backdrop-blur-sm">
+        <div className="flex items-center justify-between border-b border-line px-4 py-2.5">
+          <div className="flex items-center gap-2 font-mono text-[11px] text-muted">
+            <span className="relative flex size-1.5">
+              <span className="absolute inline-flex size-full animate-ping rounded-full bg-signal opacity-70" />
+              <span className="relative inline-flex size-1.5 rounded-full bg-signal" />
+            </span>
+            streaming-agg · RUNNING
+          </div>
+          <div className="font-mono text-[10px] text-dim">parallelism 4</div>
+        </div>
+
+        <StreamViz />
+
+        <div className="grid grid-cols-3 divide-x divide-line border-t border-line font-mono text-[11px]">
+          {facts.map((fact) => (
+            <div key={fact.k} className="px-4 py-3">
+              <div className="text-dim">{fact.k}</div>
+              <div className="mt-0.5 text-signal">{fact.v}</div>
             </div>
-
-            {index < stages.length - 1 && (
-              <div className="flex shrink-0 items-center gap-1">
-                {[0, 1, 2].map((dot) => (
-                  <span
-                    key={dot}
-                    className="size-1 rounded-full bg-signal animate-flow"
-                    style={{ animationDelay: `${index * 0.4 + dot * 0.15}s` }}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-
-      <div className="mt-5 grid grid-cols-3 gap-3 border-t border-line pt-4 font-mono text-[11px]">
-        {[
-          { k: 'watermark', v: 'event-time' },
-          { k: 'checkpoint', v: '5s' },
-          { k: 'on failure', v: 'replay' },
-        ].map((item) => (
-          <div key={item.k}>
-            <div className="text-dim">{item.k}</div>
-            <div className="mt-0.5 text-signal">{item.v}</div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </div>
   );

@@ -29,6 +29,7 @@ export const metadata: Metadata = {
     'Data Engineering',
     'GCP',
     'Apache Beam',
+    'Apache Spark',
     'Apache Flink',
     'Airflow',
     'BigQuery',
