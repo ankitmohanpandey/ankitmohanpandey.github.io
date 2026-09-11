@@ -64,13 +64,11 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       { source: '/:path*', headers: securityHeaders },
-      {
-        // Hashed build output is immutable, so let the CDN keep it forever.
-        source: '/_next/static/:path*',
-        headers: [
-          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
-        ],
-      },
+      // Note: Next.js already sets `public, max-age=31536000, immutable` on
+      // hashed /_next/static assets itself, and that cannot be overridden.
+      // Setting it manually here is redundant and, in dev, makes Turbopack's
+      // unhashed chunks get cached forever — which causes hydration
+      // mismatches after source edits. So we do not add a static rule.
     ];
   },
 };
