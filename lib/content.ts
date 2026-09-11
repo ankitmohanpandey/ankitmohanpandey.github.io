@@ -1,6 +1,7 @@
 import { BlogPost } from './types/blog';
 import { getAllBlogPosts } from './blog';
 import { getSubstackPosts } from './sources/substack';
+import { slugify } from './utils';
 
 /**
  * The site has two content sources: MDX committed to this repo, and essays
@@ -81,4 +82,33 @@ export async function getTagCounts(): Promise<{ tag: string; count: number }[]> 
   return [...counts.entries()]
     .map(([tag, count]) => ({ tag, count }))
     .sort((a, b) => b.count - a.count);
+}
+
+/**
+ * Categories act as the broad topic taxonomy (`/blog/topics/[topic]`), one
+ * level up from the fine-grained tags in `getTagCounts`. Slugs are derived
+ * from the display name so "Data Engineering" and "data-engineering" match.
+ */
+export async function getTopics(): Promise<{ topic: string; slug: string; count: number }[]> {
+  const posts = await getAllPosts();
+  const counts = new Map<string, { topic: string; count: number }>();
+
+  for (const post of posts) {
+    for (const category of post.frontmatter.categories) {
+      const slug = slugify(category);
+      const existing = counts.get(slug);
+      counts.set(slug, { topic: category, count: (existing?.count ?? 0) + 1 });
+    }
+  }
+
+  return [...counts.entries()]
+    .map(([slug, { topic, count }]) => ({ topic, slug, count }))
+    .sort((a, b) => b.count - a.count);
+}
+
+export async function getPostsByTopic(topicSlug: string): Promise<BlogPost[]> {
+  const posts = await getAllPosts();
+  return posts.filter((post) =>
+    post.frontmatter.categories.some((category) => slugify(category) === topicSlug)
+  );
 }

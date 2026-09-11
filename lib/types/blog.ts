@@ -1,3 +1,8 @@
+export interface FaqItem {
+  question: string;
+  answer: string;
+}
+
 export interface BlogFrontmatter {
   title: string;
   description: string;
@@ -10,6 +15,10 @@ export interface BlogFrontmatter {
   readingTime?: number;
   draft?: boolean;
   canonicalUrl?: string;
+  /** One or two sentences shown as a TL;DR callout above the article body. */
+  summary?: string;
+  /** Rendered as an FAQ section at the end of the post and as FAQPage JSON-LD. */
+  faq?: FaqItem[];
 }
 
 /** Where a post's body came from, which decides how it gets rendered. */

@@ -4,9 +4,9 @@ export const site = {
   role: 'Senior Data Engineer',
   url: 'https://ankitmohanpandey.in',
   description:
-    'Senior Data Engineer building streaming and batch data platforms on GCP with Apache Beam, Airflow, BigQuery and Flink.',
+    'Senior Data Engineer building reliable data platforms on Google Cloud and exploring practical AI applications, emerging technology, and real industry problems.',
   location: 'India',
-  email: 'hello@ankitmohanpandey.in',
+  email: 'ankitmohanpandey@outlook.com',
   socials: {
     github: 'https://github.com/ankitmohanpandey',
     linkedin: 'https://www.linkedin.com/in/ankitmohanpandey',
@@ -21,4 +21,5 @@ export const navigation = [
   { href: '/', label: 'index' },
   { href: '/about', label: 'about' },
   { href: '/blog', label: 'writing' },
+  { href: '/blog/topics', label: 'topics' },
 ] as const;

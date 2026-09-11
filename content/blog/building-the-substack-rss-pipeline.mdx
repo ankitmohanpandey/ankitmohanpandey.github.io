@@ -1,0 +1,48 @@
+---
+title: "What building this site's Substack-to-RSS pipeline taught me"
+description: 'Treating a newsletter platform as a first-class content source — the architecture behind ankitmohanpandey.in and the lessons it forced.'
+tags: ['substack', 'rss', 'nextjs', 'architecture']
+categories: ['Engineering']
+author: 'Ankit Mohan Pandey'
+publishedDate: '2026-09-08'
+updatedDate: '2026-09-08'
+coverImage: '/opengraph-image'
+draft: true
+needsReview: true
+---
+
+# What building this site's Substack-to-RSS pipeline taught me
+
+I write on Substack. If this site required re-publishing every essay by hand, it would go stale within a month. So it treats Substack as a first-class content source rather than something to copy from — while still supporting hand-authored MDX for posts that need code blocks and diagrams. This post covers the architecture that made that work, and the lessons it forced.
+
+## Two sources, one type
+
+Both paths produce the same `BlogPost` shape, discriminated by a `source` field. Local MDX goes through `gray-matter` and frontmatter validation; the Substack feed is fetched, parsed with `fast-xml-parser`, and run through `sanitize-html`. Pages never branch on origin except at the single render call that picks MDX versus sanitised HTML. The payoff: adding a third source later means writing one adapter, not touching every page.
+
+## Local MDX wins ties
+
+Deduping by slug, with local files taking priority, gives a zero-migration upgrade path. I can publish a quick note on Substack, then drop an MDX file with the same slug later to replace it with a fuller article — code blocks and all — and the mirrored copy disappears on the next revalidation.
+
+## The feed never breaks the build
+
+`getSubstackPosts()` catches everything and returns an empty list on failure. If Substack is having a bad day during a deploy, the site degrades to "only MDX posts", which is a bad afternoon rather than a failed release. Graceful degradation over availability theater.
+
+## Third-party HTML is untrusted
+
+Feed bodies pass through an allowlist-based sanitizer: external links get `rel="noreferrer noopener"`, and Substack's tracking pixels are filtered out. The right mental model for any third-party HTML is that it is untrusted input until proven otherwise.
+
+## Freshness
+
+The listing, post pages, RSS and sitemap are all stale-while-revalidate on an hourly cadence, and the feed fetch shares the same revalidation tag. A Vercel cron hits the revalidation endpoint every six hours as a backstop, and a manual `?secret=` call exists for the "I just published and want it live now" case.
+
+## SEO for a mirror
+
+Mirrored posts carry a canonical link pointing back at Substack, so the original gets the ranking credit instead of competing with the mirror. RSS and sitemap are built from the merged timeline, so syndicated posts are included everywhere.
+
+## The lessons that stuck
+
+1. The blog is cacheable infrastructure, not a list of links.
+2. A content ingestion path must never take down the whole site.
+3. Sanitize everything that arrives from a third party.
+4. Keep the independence exit door open — local-first dedupe is how a newsletter issue becomes a proper article.
+5. Make syndication a deliberate, per-post decision rather than an automatic one.

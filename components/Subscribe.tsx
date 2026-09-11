@@ -2,37 +2,24 @@ import { site } from '@/lib/site';
 
 export function Subscribe() {
   return (
-    <div className="relative overflow-hidden rounded-xl border border-line bg-surface/60 p-8 sm:p-10">
-      <div className="pointer-events-none absolute -right-20 -top-20 size-64 rounded-full bg-signal/10 blur-3xl" />
-
-      <div className="relative max-w-xl">
-        <div className="eyebrow">newsletter</div>
-        <h2 className="mt-3 text-2xl font-semibold tracking-tight text-bright">
-          Occasional notes on data infrastructure
+    <section className="newsletter-panel">
+      <div className="relative max-w-2xl">
+        <div className="eyebrow text-signal">Keep the curiosity going</div>
+        <h2 className="editorial-title mt-4 text-balance text-3xl leading-tight text-bright sm:text-5xl">
+          Technology worth your time.
         </h2>
-        <p className="mt-3 text-sm leading-relaxed text-muted">
-          Written on Substack, mirrored here automatically. No cadence promises —
-          it goes out when there&apos;s something worth saying about streaming,
-          warehousing or the failure modes in between.
+        <p className="mt-5 max-w-xl text-base leading-relaxed text-muted">
+          Useful ideas, things I&apos;ve learned, and discoveries worth passing on.
+          If that sounds like your kind of reading, join me on Substack.
         </p>
-
-        <div className="mt-6 flex flex-wrap items-center gap-4">
-          <a
-            href={site.socials.substack}
-            target="_blank"
-            rel="noreferrer noopener"
-            className="rounded-md bg-signal px-5 py-2.5 font-mono text-sm font-medium text-void transition-opacity hover:opacity-90"
-          >
-            subscribe on substack
+        <div className="mt-8 flex flex-wrap items-center gap-5">
+          <a href={site.socials.substack} target="_blank" rel="noreferrer noopener" className="action-primary">
+            Subscribe on Substack <span aria-hidden="true">↗</span>
           </a>
-          <a
-            href="/rss.xml"
-            className="font-mono text-sm text-dim transition-colors hover:text-signal"
-          >
-            or grab the rss feed
-          </a>
+          <a href="/rss.xml" className="text-sm text-muted transition-colors hover:text-signal">Prefer RSS? Follow the feed →</a>
         </div>
       </div>
-    </div>
+      <div aria-hidden="true" className="newsletter-mark">&amp;</div>
+    </section>
   );
 }

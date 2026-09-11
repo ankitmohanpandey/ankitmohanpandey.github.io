@@ -11,13 +11,13 @@ const external = [
 export function Footer() {
   return (
     <footer className="mt-32 border-t border-line">
-      <div className="mx-auto max-w-5xl px-6 py-12">
+      <div className="mx-auto max-w-6xl px-6 py-12">
         <div className="flex flex-col gap-8 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <div className="font-mono text-sm text-fg">{site.handle}</div>
             <p className="mt-2 max-w-xs text-sm text-dim">
-              Notes on streaming systems, data platforms and the unglamorous
-              parts of making pipelines reliable.
+              Building thoughtful data systems. Sharing useful ideas about
+              technology. Always making room to learn.
             </p>
           </div>
 

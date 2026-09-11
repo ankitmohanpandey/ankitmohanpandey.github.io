@@ -12,17 +12,6 @@ import { calculateReadingTime, slugify } from '@/lib/utils';
 
 const FEED_REVALIDATE_SECONDS = 60 * 60;
 
-interface RssItem {
-  title?: string;
-  link?: string;
-  guid?: string | { '#text'?: string };
-  pubDate?: string;
-  description?: string;
-  'content:encoded'?: string;
-  category?: string | string[];
-  enclosure?: { '@_url'?: string };
-}
-
 const parser = new XMLParser({
   ignoreAttributes: false,
   attributeNamePrefix: '@_',
@@ -72,17 +61,49 @@ function asArray<T>(value: T | T[] | undefined): T[] {
   return Array.isArray(value) ? value : [value];
 }
 
-function itemToPost(item: RssItem): BlogPost | null {
-  const title = item.title?.trim();
-  const link = item.link?.trim();
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function itemToPost(item: unknown): BlogPost | null {
+  if (!isRecord(item)) return null;
+
+  const title = typeof item.title === 'string' ? item.title.trim() : '';
+  const link = typeof item.link === 'string' ? item.link.trim() : '';
   if (!title || !link) return null;
 
-  const body = item['content:encoded'] ?? item.description ?? '';
+  try {
+    const url = new URL(link);
+    if (
+      url.protocol !== 'https:' ||
+      url.origin !== new URL(site.substackFeed).origin ||
+      url.username ||
+      url.password
+    ) return null;
+  } catch {
+    return null;
+  }
+
+  if (typeof item.pubDate !== 'string' || !item.pubDate.trim()) return null;
+  const publishedDate = new Date(item.pubDate);
+  if (!Number.isFinite(publishedDate.getTime())) return null;
+
+  const rawDescription = typeof item.description === 'string' ? item.description : '';
+  const body = typeof item['content:encoded'] === 'string'
+    ? item['content:encoded']
+    : rawDescription;
   const html = clean(body);
   const text = toPlainText(html);
 
   const description =
-    toPlainText(item.description ?? '').slice(0, 200) || text.slice(0, 200);
+    toPlainText(rawDescription).slice(0, 200) || text.slice(0, 200);
+  const tags = [...new Set(asArray(item.category)
+    .filter((category): category is string => typeof category === 'string')
+    .map((category) => category.trim())
+    .filter(Boolean))];
+  const enclosureUrl = isRecord(item.enclosure) && typeof item.enclosure['@_url'] === 'string'
+    ? item.enclosure['@_url']
+    : undefined;
 
   return {
     slug: slugify(title),
@@ -94,14 +115,25 @@ function itemToPost(item: RssItem): BlogPost | null {
     frontmatter: {
       title,
       description,
-      tags: asArray(item.category).filter(Boolean),
+      tags,
       categories: ['Newsletter'],
-      coverImage: item.enclosure?.['@_url'] ?? firstImage(html),
+      coverImage: enclosureUrl ?? firstImage(html),
       author: site.name,
-      publishedDate: new Date(item.pubDate ?? Date.now()).toISOString(),
+      publishedDate: publishedDate.toISOString(),
       canonicalUrl: link,
     },
   };
+}
+
+export function parseSubstackFeed(xml: string): BlogPost[] {
+  const parsed: unknown = parser.parse(xml);
+  if (!isRecord(parsed) || !isRecord(parsed.rss)) return [];
+  const channel = parsed.rss.channel;
+  if (!isRecord(channel)) return [];
+
+  return asArray(channel.item)
+    .map(itemToPost)
+    .filter((post): post is BlogPost => post !== null);
 }
 
 /**
@@ -120,12 +152,7 @@ export async function getSubstackPosts(): Promise<BlogPost[]> {
       return [];
     }
 
-    const parsed = parser.parse(await response.text());
-    const items = asArray<RssItem>(parsed?.rss?.channel?.item);
-
-    return items
-      .map(itemToPost)
-      .filter((post): post is BlogPost => post !== null);
+    return parseSubstackFeed(await response.text());
   } catch (error) {
     console.warn('[substack] feed unavailable:', error);
     return [];

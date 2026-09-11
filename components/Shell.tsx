@@ -22,7 +22,7 @@ export function Shell({ children, className }: ShellProps) {
 /** Standard content column. Every page uses this so gutters stay consistent. */
 export function Container({ children, className }: ShellProps) {
   return (
-    <div className={cn('mx-auto w-full max-w-5xl px-6', className)}>{children}</div>
+    <div className={cn('mx-auto w-full max-w-6xl px-6', className)}>{children}</div>
   );
 }
 
@@ -37,7 +37,7 @@ export function SectionHeading({ eyebrow, title, action }: SectionHeadingProps) 
     <div className="mb-8 flex items-end justify-between gap-6 border-b border-line pb-4">
       <div>
         <div className="eyebrow">{eyebrow}</div>
-        <h2 className="mt-2 text-2xl font-semibold tracking-tight text-bright">
+        <h2 className="editorial-title mt-3 text-3xl text-bright sm:text-4xl">
           {title}
         </h2>
       </div>

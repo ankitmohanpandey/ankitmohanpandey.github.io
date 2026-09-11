@@ -2,16 +2,16 @@
 
 @theme inline {
   /* Neutral ramp: cool, near-black, tuned for long-form reading. */
-  --color-void: #05070a;
-  --color-base: #080b10;
-  --color-surface: #0d1117;
-  --color-raised: #141a23;
-  --color-line: #1c2430;
-  --color-line-strong: #2b3543;
-  --color-dim: #6b7789;
-  --color-muted: #98a3b5;
-  --color-fg: #e4e9f1;
-  --color-bright: #ffffff;
+  --color-void: #0b1016;
+  --color-base: #0e141c;
+  --color-surface: #141d27;
+  --color-raised: #1b2632;
+  --color-line: #26323e;
+  --color-line-strong: #3b4b59;
+  --color-dim: #96a5b4;
+  --color-muted: #b0bbc6;
+  --color-fg: #e8ecee;
+  --color-bright: #f7f5ef;
 
   /* Phosphor accent. Used sparingly so it keeps its signal value. */
   --color-signal: #4ade80;
@@ -25,6 +25,7 @@
   --animate-flow: flow 3s ease-in-out infinite;
   --animate-blink: blink 1.2s step-end infinite;
   --animate-rise: rise 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-word-grow: word-grow 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 @keyframes marquee {
@@ -64,6 +65,19 @@
   to {
     opacity: 1;
     transform: none;
+  }
+}
+
+/* Each new word in GrowingWords eases in slightly smaller and settles at
+   full size — reads as "growing" rather than a plain crossfade. */
+@keyframes word-grow {
+  from {
+    opacity: 0;
+    transform: scale(0.82) translateY(3px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
   }
 }
 
@@ -126,6 +140,101 @@
     border-color: var(--color-line);
   }
 
+  .editorial-title {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-weight: 400;
+    letter-spacing: -0.045em;
+  }
+
+  .action-primary,
+  .action-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 0.8rem 1.2rem;
+    border: 1px solid var(--color-line-strong);
+    border-radius: 0.4rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: background-color 160ms, border-color 160ms;
+  }
+
+  .action-primary {
+    background: var(--color-signal);
+    border-color: var(--color-signal);
+    color: var(--color-void);
+  }
+
+  .action-primary:hover {
+    background: #9aefb9;
+  }
+
+  .action-secondary:hover {
+    border-color: var(--color-signal);
+    background: var(--color-surface);
+  }
+
+  .journal-header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 2rem;
+    padding-bottom: 3rem;
+    border-bottom: 1px solid var(--color-line);
+  }
+
+  .journal-layout {
+    display: grid;
+    gap: 3rem;
+    margin-top: 3rem;
+  }
+
+  .featured-story {
+    border: 1px solid var(--color-line-strong);
+    border-top: 2px solid var(--color-signal);
+    border-radius: 0.65rem;
+    padding: clamp(1.5rem, 4vw, 2.5rem);
+    background: linear-gradient(135deg, var(--color-surface), var(--color-base));
+  }
+
+  .journal-aside {
+    border-top: 1px solid var(--color-line);
+    padding-top: 2rem;
+  }
+
+  .newsletter-panel {
+    position: relative;
+    overflow: hidden;
+    padding: clamp(1.5rem, 5vw, 3.5rem);
+    background: linear-gradient(120deg, #162c29, var(--color-surface));
+    border: 1px solid #354d48;
+    border-radius: 0.8rem;
+  }
+
+  .newsletter-mark {
+    position: absolute;
+    right: -1rem;
+    bottom: -6rem;
+    font: italic 24rem/1 Georgia, serif;
+    color: var(--color-signal);
+    opacity: 0.045;
+    pointer-events: none;
+  }
+
+  @media (min-width: 1024px) {
+    .journal-layout {
+      grid-template-columns: minmax(0, 1fr) 15rem;
+    }
+
+    .journal-aside {
+      align-self: start;
+      border-top: 0;
+      border-left: 1px solid var(--color-line);
+      padding: 0 0 0 2rem;
+    }
+  }
+
   /* Small uppercase mono label used as a section eyebrow. */
   .eyebrow {
     font-family: var(--font-mono);
@@ -141,13 +250,31 @@
  * ---------------------------------------------------------------- */
 
 .article {
-  color: var(--color-muted);
-  font-size: 1.0625rem;
-  line-height: 1.8;
+  color: var(--color-fg);
+  font-size: clamp(1rem, 1.5vw, 1.125rem);
+  line-height: 1.85;
+  overflow-wrap: anywhere;
 }
 
-.article > * + * {
+.article > * + *,
+.article > div > * + * {
   margin-top: 1.4em;
+}
+
+.article table {
+  display: block;
+  overflow-x: auto;
+}
+
+.article img {
+  max-width: 100%;
+  height: auto;
+}
+
+.article h1 {
+  font-size: 1.75rem;
+  line-height: 1.3;
+  color: var(--color-bright);
 }
 
 .article h2,

@@ -1,7 +1,10 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { Shell, Container } from '@/components/Shell';
 import { Capabilities } from '@/components/home/Capabilities';
+import { GrowingWords } from '@/components/GrowingWords';
 import { site } from '@/lib/site';
+import { currentlyLearning } from '@/lib/work';
 
 export const metadata: Metadata = {
   title: 'About',
@@ -41,20 +44,26 @@ export default function AboutPage() {
         <header className="border-b border-line pb-10">
           <div className="eyebrow">about</div>
           <h1 className="mt-3 max-w-3xl text-balance text-4xl font-semibold leading-tight tracking-tight text-bright">
-            Data engineer, mostly on the streaming side
+            Grounded in data engineering. Curious about what comes next.
           </h1>
           <div className="mt-6 max-w-2xl space-y-4 text-muted">
             <p>
-              I design and run the pipelines that move data from wherever it is
-              produced to wherever someone needs to make a decision with it —
-              usually on Google Cloud, usually with Apache Beam or Flink doing the
-              heavy lifting and Airflow keeping the schedule honest.
+              I&apos;m a senior data engineer working on streaming and batch platforms
+              with Google Cloud, Apache Beam, Flink, Airflow, and BigQuery. I care
+              about the decisions behind the implementation: correctness, recovery,
+              cost, and whether the next engineer can understand and operate the system.
             </p>
             <p>
-              Most of my interesting work happens at the boundaries: late-arriving
-              events, schema evolution, replaying a day of data without producing
-              duplicates, keeping BigQuery costs from quietly tripling. That is the
-              part I write about.
+              The details matter: late-arriving events, changing schemas, replaying
+              data without duplicates, and keeping warehouse costs predictable.
+              Good engineering means understanding those trade-offs, not just choosing a tool.
+            </p>
+            <p>
+              I&apos;m also exploring how that foundation supports AI-driven products:
+              trustworthy data for retrieval, useful agent workflows, and ways to
+              evaluate whether an AI system is actually helping. My goal is to connect
+              emerging technology with real industry problems, without losing sight
+              of reliability, privacy, or cost.
             </p>
           </div>
         </header>
@@ -74,6 +83,27 @@ export default function AboutPage() {
         <section className="pb-14">
           <div className="eyebrow mb-6">toolkit</div>
           <Capabilities />
+        </section>
+
+        <section className="pb-14">
+          <div className="relative overflow-hidden rounded-xl border border-line bg-surface/60 p-6 sm:p-8">
+            <div className="pointer-events-none absolute -right-16 -top-16 size-40 rounded-full bg-signal/10 blur-2xl" />
+            <div className="eyebrow">always learning</div>
+            <p className="relative mt-3 max-w-2xl text-muted">
+              Experience gives me a foundation, not a reason to stop learning.
+              My current interests include{' '}
+              <GrowingWords words={currentlyLearning} className="text-signal" />.
+              I want to understand where new approaches earn their place, what they
+              improve, and where simpler solutions still work better. I share that learning on{' '}
+              <Link
+                href="/blog"
+                className="text-fg underline decoration-line-strong transition-colors hover:text-signal hover:decoration-signal"
+              >
+                the writing page
+              </Link>
+              .
+            </p>
+          </div>
         </section>
 
         <section className="border-t border-line pt-10">

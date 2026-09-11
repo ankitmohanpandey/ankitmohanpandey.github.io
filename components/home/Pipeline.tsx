@@ -3,7 +3,7 @@ import { StreamViz } from '@/components/home/StreamViz';
 const facts = [
   { k: 'semantics', v: 'event-time' },
   { k: 'delivery', v: 'exactly-once' },
-  { k: 'on failure', v: 'replay' },
+  { k: 'on failure', v: 'replay · DLQ' },
 ];
 
 export function Pipeline() {
@@ -19,7 +19,7 @@ export function Pipeline() {
               <span className="absolute inline-flex size-full animate-ping rounded-full bg-signal opacity-70" />
               <span className="relative inline-flex size-1.5 rounded-full bg-signal" />
             </span>
-            streaming-agg · RUNNING
+            flink-agg · DEMO
           </div>
           <div className="font-mono text-[10px] text-dim">parallelism 4</div>
         </div>

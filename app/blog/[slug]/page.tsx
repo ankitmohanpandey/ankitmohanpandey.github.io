@@ -6,8 +6,12 @@ import { TableOfContents } from '@/components/blog/TableOfContents';
 import { PostNavigation } from '@/components/blog/PostNavigation';
 import { RelatedPosts } from '@/components/blog/RelatedPosts';
 import { CodeBlock } from '@/components/blog/CodeBlock';
+import { Breadcrumb } from '@/components/blog/Breadcrumb';
+import { Byline } from '@/components/blog/Byline';
+import { Tldr } from '@/components/blog/Tldr';
+import { FaqSection } from '@/components/blog/FaqSection';
 import { getPostBySlug, getRelatedPosts, getAdjacentPosts, getAllPosts } from '@/lib/content';
-import { formatDate } from '@/lib/utils';
+import { formatDate, slugify } from '@/lib/utils';
 import { extractHeadings } from '@/lib/headings';
 import { site } from '@/lib/site';
 
@@ -31,7 +35,7 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
   if (!post) return { title: 'Post not found' };
 
   const { frontmatter } = post;
-  const images = frontmatter.coverImage ? [frontmatter.coverImage] : ['/og-image.png'];
+  const images = frontmatter.coverImage ? [frontmatter.coverImage] : ['/opengraph-image'];
 
   return {
     title: frontmatter.title,
@@ -73,6 +77,8 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   // Syndicated HTML has no stable heading ids, so the outline is MDX-only.
   const headings = post.source === 'local' ? extractHeadings(post.content) : [];
 
+  const primaryCategory = frontmatter.categories[0];
+
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'BlogPosting',
@@ -85,31 +91,43 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     mainEntityOfPage: frontmatter.canonicalUrl ?? `${site.url}/blog/${post.slug}`,
   };
 
+  const faqJsonLd = frontmatter.faq?.length
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: frontmatter.faq.map((item) => ({
+          '@type': 'Question',
+          name: item.question,
+          acceptedAnswer: { '@type': 'Answer', text: item.answer },
+        })),
+      }
+    : null;
+
   return (
     <Shell>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }}
       />
+      {faqJsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, '\\u003c') }}
+        />
+      )}
 
       <Container className="py-16">
         <article>
-          <header className="mx-auto max-w-3xl border-b border-line pb-8">
-            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-[11px] text-dim">
-              <time dateTime={frontmatter.publishedDate}>
-                {formatDate(frontmatter.publishedDate)}
-              </time>
-              <span className="text-line-strong">/</span>
-              <span>{post.readingTime} min read</span>
-              {post.source === 'substack' && (
-                <>
-                  <span className="text-line-strong">/</span>
-                  <span className="text-signal">from the newsletter</span>
-                </>
-              )}
-            </div>
+          <header className="max-w-3xl border-b border-line pb-10">
+            <Breadcrumb
+              topic={
+                primaryCategory
+                  ? { label: primaryCategory, slug: slugify(primaryCategory) }
+                  : undefined
+              }
+            />
 
-            <h1 className="mt-4 text-balance text-3xl font-semibold leading-tight tracking-tight text-bright sm:text-4xl">
+            <h1 className="editorial-title mt-6 text-balance text-4xl leading-[1.12] text-bright sm:text-6xl">
               {frontmatter.title}
             </h1>
 
@@ -119,20 +137,47 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
               </p>
             )}
 
-            {post.externalUrl && (
-              <a
-                href={post.externalUrl}
-                target="_blank"
-                rel="noreferrer noopener"
-                className="mt-5 inline-block font-mono text-xs text-dim transition-colors hover:text-signal"
-              >
-                originally published on substack ↗
-              </a>
+            <div className="mt-5">
+              <Byline
+                author={frontmatter.author}
+                publishedDate={frontmatter.publishedDate}
+                readingTime={post.readingTime}
+                category={primaryCategory}
+              />
+            </div>
+
+            {(frontmatter.updatedDate || post.source === 'substack' || post.externalUrl) && (
+              <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-[11px] text-dim">
+                {frontmatter.updatedDate && (
+                  <time dateTime={frontmatter.updatedDate}>
+                    last updated {formatDate(frontmatter.updatedDate)}
+                  </time>
+                )}
+                {post.source === 'substack' && (
+                  <span className="text-signal">from the newsletter</span>
+                )}
+                {post.externalUrl && (
+                  <a
+                    href={post.externalUrl}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    className="transition-colors hover:text-signal"
+                  >
+                    originally published on substack ↗
+                  </a>
+                )}
+              </div>
             )}
           </header>
 
           <div className="mt-10 gap-12 lg:grid lg:grid-cols-[minmax(0,1fr)_14rem]">
             <div className="mx-auto w-full max-w-3xl">
+              {frontmatter.summary && (
+                <div className="mb-10">
+                  <Tldr summary={frontmatter.summary} />
+                </div>
+              )}
+
               <div className="article">
                 {post.source === 'substack' && post.html ? (
                   <div dangerouslySetInnerHTML={{ __html: post.html }} />
@@ -153,6 +198,8 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                   ))}
                 </div>
               )}
+
+              {frontmatter.faq && <FaqSection items={frontmatter.faq} />}
 
               <PostNavigation previous={previous} next={next} />
               <RelatedPosts posts={related} />
